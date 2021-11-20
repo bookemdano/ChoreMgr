@@ -2,10 +2,10 @@
 @model ChoreMgr.Pages.Chores.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Chores";
 }
 
-<h1>Index</h1>
+<h1>Chores from @Model.Filename</h1>
 
 <p>
     <a asp-page="Create">Create New</a>
@@ -14,13 +14,19 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.ChoreList[0].Status)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.ChoreList[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ChoreList[0].IntervalDays)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ChoreList[0].LastDone)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ChoreList[0].IntervalDays)
+                @Html.DisplayNameFor(model => model.ChoreList[0].NextDo)
             </th>
             <th></th>
         </tr>
@@ -29,18 +35,24 @@
 @foreach (var item in Model.ChoreList) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.LastDone)
+                @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.IntervalDays)
             </td>
             <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                @Html.DisplayFor(modelItem => item.LastDone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NextDo)
+            </td>
+            <td>
+                <a asp-page-handler="Today" asp-route-id="@item.Id">Today</a>
+                <a asp-page-handler="Yesterday" asp-route-id="@item.Id">Yesterday</a>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a>
             </td>
         </tr>
 }

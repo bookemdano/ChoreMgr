@@ -13,9 +13,9 @@ namespace ChoreMgr.Pages.Chores
 {
     public class EditModel : PageModel
     {
-        private readonly ChoreMgr.Data.ChoreMgrContext _context;
+        private readonly XclChoreMgrContext _context;
 
-        public EditModel(ChoreMgr.Data.ChoreMgrContext context)
+        public EditModel(XclChoreMgrContext context)
         {
             _context = context;
         }
@@ -30,7 +30,7 @@ namespace ChoreMgr.Pages.Chores
                 return NotFound();
             }
 
-            Chore = await _context.Chores.FirstOrDefaultAsync(m => m.Id == id);
+            Chore = _context.Chores.FirstOrDefault(m => m.Id == id);
 
             if (Chore == null)
             {
@@ -47,7 +47,9 @@ namespace ChoreMgr.Pages.Chores
             {
                 return Page();
             }
-
+            _context.SaveChore(Chore, null);
+            /*
+             * old school
             _context.Attach(Chore).State = EntityState.Modified;
 
             try
@@ -65,7 +67,7 @@ namespace ChoreMgr.Pages.Chores
                     throw;
                 }
             }
-
+            */
             return RedirectToPage("./Index");
         }
 
