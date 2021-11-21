@@ -13,9 +13,9 @@ namespace ChoreMgr.Pages.Chores
 {
     public class EditModel : PageModel
     {
-        private readonly XclChoreMgrContext _context;
+        private readonly XlChoreMgrContext _context;
 
-        public EditModel(XclChoreMgrContext context)
+        public EditModel(XlChoreMgrContext context)
         {
             _context = context;
         }

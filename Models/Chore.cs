@@ -8,23 +8,39 @@ namespace ChoreMgr.Models
         {
 
         }
-        public Chore(string name)
+        public Chore(int id, string name)
         {
             Name = name;
-            Id = name.GetHashCode();
+            Id = id;
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
 
+        [Display(Name = "Last")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
         public DateTime? LastDone { get; set; }
 
+        [Display(Name = "Int")]
         public int? IntervalDays { get; set; }
+        [Display(Name = "Next")]
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MMM}")]
-        public DateTime? NextDo { get; internal set; }
+        public DateTime? NextDo
+        {
+            get
+            {
+                if (LastDone.HasValue && !IntervalDays.HasValue)
+                    return null;    // it is not repeated and it has been done
+                else if (!LastDone.HasValue)
+                    return DateTime.Today.AddDays(.999);
+                else
+                    return LastDone.Value.AddDays(IntervalDays.Value + .999);
+            }
+        }
+
+        [Display(Name = "S")]
         public string Status 
         { 
             get
@@ -39,16 +55,6 @@ namespace ChoreMgr.Models
                 else
                     return "❕";
             }
-        }
-
-        internal static Chore Fake()
-        {
-            var rnd = new Random();
-            var rv = new Chore(Guid.NewGuid().ToString());
-            rv.Id = rnd.Next();
-            rv.LastDone = DateTime.Today.AddDays(rnd.Next(-10, 3));
-            rv.IntervalDays = rnd.Next(7);
-            return rv;
         }
     }
 }

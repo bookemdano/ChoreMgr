@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ChoreMgr.Data;
+using ChoreMgr.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using ChoreMgr.Data;
-using ChoreMgr.Models;
 
 namespace ChoreMgr.Pages.Chores
 {
     public class CreateModel : PageModel
     {
-        private readonly ChoreMgr.Data.ChoreMgrContext _context;
+        private readonly XlChoreMgrContext _context;
 
-        public CreateModel(ChoreMgr.Data.ChoreMgrContext context)
+        public CreateModel(XlChoreMgrContext context)
         {
             _context = context;
         }
@@ -35,9 +30,8 @@ namespace ChoreMgr.Pages.Chores
                 return Page();
             }
 
-            _context.Chores.Add(Chore);
-            await _context.SaveChangesAsync();
-
+            _context.AddChore(Chore);
+        
             return RedirectToPage("./Index");
         }
     }
