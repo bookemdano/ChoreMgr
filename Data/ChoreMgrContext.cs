@@ -71,7 +71,6 @@ namespace ChoreMgr.Data
     }
     public class XlChoreMgrContext : DbContext
     {
-        JournalSheet _journal = new JournalSheet();
         public XlChoreMgrContext(DbContextOptions<XlChoreMgrContext> options)
             : base(options)
         {
@@ -93,7 +92,8 @@ namespace ChoreMgr.Data
                 {
 
 #if DEBUG
-                    var filename = @"c:\temp\Chores Copy.xlsm";
+                    //var filename = @"c:\temp\Chores Copy.xlsm";
+                    var filename = "/Users/danielfrancis/OneDrive/dan/Chores Copy.xlsm";
 #else
                     var filename = @"F:\OneDrive\Dan\Chores 2021.xlsm";
 #endif
