@@ -8,21 +8,13 @@ namespace ChoreMgr.Models
         {
 
         }
-        public Chore(int id, string name)
+        public Chore(int id)
         {
-            Name = name;
             Id = id;
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
-        public int Row
-        {
-            get
-            {
-                return Id;
-            }
-        }
 
         [Display(Name = "Last")]
         [DataType(DataType.Date)]

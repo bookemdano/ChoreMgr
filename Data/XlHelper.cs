@@ -19,16 +19,16 @@ namespace ChoreMgr.Data
         {
             get
             {
-                return System.IO.Path.GetFileNameWithoutExtension(_filename);
+                return Path.GetFileNameWithoutExtension(_filename);
             }
         }
 
-        private Dictionary<SheetEnum, ExcelWorksheet> _sheets = new Dictionary<SheetEnum, ExcelWorksheet>();
-        ExcelWorksheet GetSheet(SheetEnum sheetEnum)
+        private Dictionary<string, ExcelWorksheet> _sheets = new Dictionary<string, ExcelWorksheet>();
+        ExcelWorksheet GetSheet(string sheetName)
         {
-            if (!_sheets.ContainsKey(sheetEnum))
-                _sheets[sheetEnum] = _book.Worksheets[sheetEnum.ToString()];
-            return _sheets[sheetEnum];
+            if (!_sheets.ContainsKey(sheetName))
+                _sheets[sheetName] = _book.Worksheets[sheetName];
+            return _sheets[sheetName];
         }
 
         ExcelPackage GetPackage()
@@ -36,19 +36,44 @@ namespace ChoreMgr.Data
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             return new ExcelPackage(new FileInfo(_filename));
         }
-        internal bool IsNull(SheetEnum sheetEnum, int row, int col)
+        internal bool IsNull(string sheetName, int row, int col)
         {
-            return GetSheet(sheetEnum).Cells[row, col]?.Value == null;
+            return GetSheet(sheetName).Cells[row, col]?.Value == null;
         }
 
-        internal int FirstBlank(SheetEnum sheetEnum)
+        internal int FirstBlank(XlField col)
         {
             for (int iRow = 2; iRow < 1000; iRow++)
             {
-                if (IsNull(sheetEnum, iRow, 1))
+                if (IsNull(col.SheetName, iRow, col.Col))
                     return iRow;
             }
             return -1;
+        }
+        internal int Max(XlField field)
+        {
+            var max = 0;
+            for (int iRow = 2; iRow < 1000; iRow++)
+            {
+                var v = GetInt(new XlCell(field, iRow));
+                if (v == null)
+                    break;
+                if (v > max)
+                    max = v.Value;
+            }
+            return max;
+        }
+        internal int? FindRow(XlField field, int id)
+        {
+            for (int iRow = 2; iRow < 1000; iRow++)
+            {
+                var foundId = GetInt(new XlCell(field, iRow));
+                if (foundId == null)
+                    break;
+                if (foundId == id)
+                    return iRow;
+            }
+            return null;
         }
 
         public void Dispose()
@@ -70,20 +95,20 @@ namespace ChoreMgr.Data
             }
         }
 
-        internal void Set(SheetEnum sheetEnum, int row, int col, object? val)
+        internal void Set(XlCell cell, object? val)
         {
-            GetSheet(sheetEnum).Cells[row, col].Value = val;
+            GetSheet(cell.SheetName).Cells[cell.Row, cell.Col].Value = val;
         }
-        internal string GetString(SheetEnum sheetEnum, int row, int col)
+        internal string GetString(XlCell cell)
         {
-            var r = GetSheet(sheetEnum).Cells[row, col];
+            var r = GetSheet(cell.SheetName).Cells[cell.Row, cell.Col];
             if (r?.Value == null)
                 return null;
             return (string)r.Value;
         }
-        internal DateTime? GetDate(SheetEnum sheetEnum, int row, int col)
+        internal DateTime? GetDate(XlCell cell)
         {
-            var r = GetSheet(sheetEnum).Cells[row, col];
+            var r = GetSheet(cell.SheetName).Cells[cell.Row, cell.Col];
             if (r?.Value == null)
                 return null;
 
@@ -94,17 +119,17 @@ namespace ChoreMgr.Data
             return DateTime.Parse("1/1/1900").AddDays(d - 2);
         }
 
-        internal int? GetInt(SheetEnum sheetEnum, int row, int col)
+        internal int? GetInt(XlCell cell)
         {
-            var r = GetSheet(sheetEnum).Cells[row, col];
+            var r = GetSheet(cell.SheetName).Cells[cell.Row, cell.Col];
             if (r?.Value == null)
                 return null;
 
             return Convert.ToInt32(r.Value);
         }
-        internal void RemoveRow(SheetEnum sheetEnum, int row)
+        internal void RemoveRow(XlCell cell)
         {
-            GetSheet(sheetEnum).DeleteRow(row);
+            GetSheet(cell.SheetName).DeleteRow(cell.Row);
         }
     }
 }

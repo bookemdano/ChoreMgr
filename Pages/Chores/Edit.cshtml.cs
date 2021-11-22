@@ -47,7 +47,7 @@ namespace ChoreMgr.Pages.Chores
             {
                 return Page();
             }
-            _context.SaveChore(Chore, null);
+            _context.SaveChore(Chore);
             /*
              * old school
             _context.Attach(Chore).State = EntityState.Modified;

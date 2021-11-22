@@ -47,9 +47,8 @@ namespace ChoreMgr.Pages.Chores
             if (chore == null)
                 return Page();
 
-            var oldLast = chore.LastDone;
             chore.LastDone = date;
-            _context.SaveChore(chore, oldLast);
+            _context.SaveChore(chore);
 
             return RedirectToPage("./Index");
         }
