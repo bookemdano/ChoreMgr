@@ -16,6 +16,13 @@ namespace ChoreMgr.Models
 
         public int Id { get; set; }
         public string Name { get; set; }
+        public int Row
+        {
+            get
+            {
+                return Id;
+            }
+        }
 
         [Display(Name = "Last")]
         [DataType(DataType.Date)]
@@ -64,13 +71,26 @@ namespace ChoreMgr.Models
         static internal string DeltaString(Chore? oldChore, Chore? newChore)
         {
             var deltas = new List<string>();
+            if (oldChore == null)
+                deltas.Add("New");
+            if (newChore == null)
+                deltas.Add("Delete");
             if (newChore?.Name != oldChore?.Name)
-                deltas.Add($"Name Old:{oldChore?.Name} New:{newChore?.Name}");
+                deltas.Add($"Name {OldNew(oldChore?.Name, newChore?.Name)}");
             if (newChore?.IntervalDays != oldChore?.IntervalDays)
-                deltas.Add($"Interval Old:{oldChore?.IntervalDays} New:{newChore?.IntervalDays}");
+                deltas.Add($"Interval {OldNew(oldChore?.IntervalDays, newChore?.IntervalDays)}");
             if (newChore?.LastDone != oldChore?.LastDone)
-                deltas.Add($"LastDone Old:{oldChore?.LastDone?.ToShortDateString()} New:{newChore?.LastDone?.ToShortDateString()}");
+                deltas.Add($"LastDone {OldNew(oldChore?.LastDone?.ToShortDateString(), newChore?.LastDone?.ToShortDateString())}");
             return String.Join("|", deltas);
+        }
+        static string OldNew(object? oldOne, object? newOne)
+        {
+            var parts = new List<string>();
+            if (oldOne != null)
+                parts.Add($"Old:{oldOne}");
+            if (newOne != null)
+                parts.Add($"New:{newOne}");
+            return String.Join(" ", parts);
         }
     }
 }

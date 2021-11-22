@@ -1,14 +1,17 @@
 ﻿using OfficeOpenXml;
+using ChoreMgr;
 
 namespace ChoreMgr.Data
 {
     class XlHelper : IDisposable
     {
+        private string _filename;
         private ExcelPackage _package;
         private ExcelWorkbook _book;
 
-        public XlHelper()
+        public XlHelper(string filename)
         {
+            _filename = filename;
             _package = GetPackage();
             _book = _package.Workbook;
         }
@@ -16,7 +19,7 @@ namespace ChoreMgr.Data
         {
             get
             {
-                return System.IO.Path.GetFileNameWithoutExtension(Filename);
+                return System.IO.Path.GetFileNameWithoutExtension(_filename);
             }
         }
 
@@ -28,15 +31,10 @@ namespace ChoreMgr.Data
             return _sheets[sheetEnum];
         }
 
-#if DEBUG
-        public string Filename { get; } = @"c:\temp\Chores Copy.xlsm";
-#else
-        public string Filename { get; } = @"F:\OneDrive\Dan\Chores 2021.xlsm";
-#endif
         ExcelPackage GetPackage()
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            return new ExcelPackage(new FileInfo(Filename));
+            return new ExcelPackage(new FileInfo(_filename));
         }
         internal bool IsNull(SheetEnum sheetEnum, int row, int col)
         {
@@ -60,7 +58,16 @@ namespace ChoreMgr.Data
 
         internal void Save()
         {
-            _package.Save();
+            try
+            {
+                _package.Save();
+
+            }
+            catch (Exception ex)
+            {
+                DanLogger.Error("XlHelper.Save()", ex);
+                throw;
+            }
         }
 
         internal void Set(SheetEnum sheetEnum, int row, int col, object? val)
@@ -80,7 +87,11 @@ namespace ChoreMgr.Data
             if (r?.Value == null)
                 return null;
 
-            return Convert.ToDateTime(r.Value);
+            if (r.Value is DateTime)
+                return Convert.ToDateTime(r.Value);
+            
+            var d = Convert.ToDouble(r.Value);
+            return DateTime.Parse("1/1/1900").AddDays(d - 2);
         }
 
         internal int? GetInt(SheetEnum sheetEnum, int row, int col)

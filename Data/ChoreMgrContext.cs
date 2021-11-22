@@ -32,7 +32,15 @@ namespace ChoreMgr.Data
             get
             {
                 if (_xlHelper == null)
-                    _xlHelper = new XlHelper();
+                {
+
+#if DEBUG
+                    var filename = @"c:\temp\Chores Copy.xlsm";
+#else
+                    var filename = @"F:\OneDrive\Dan\Chores 2021.xlsm";
+#endif
+                    _xlHelper = new XlHelper(filename);
+                }
                 return _xlHelper;
             }
         }
@@ -47,18 +55,23 @@ namespace ChoreMgr.Data
         }
         public bool DeleteChore(Chore chore)
         {
-            var choreRow = FindChoreRow(chore.Id);
-            if (choreRow <= 0)
-                throw new Exception($"Chore {chore} not found");
-            var foundName = Workbook.GetString(SheetEnum.Main, choreRow, _colName);
-            if (foundName.CompareTo(chore.Name) != 0)
-                throw new Exception($"Chore {chore} does not match row {choreRow}");
-
-            AddToJournal(null, chore);
-            Workbook.RemoveRow(SheetEnum.Main, choreRow);
+            DeleteChoreRow(chore, ReadChore(chore.Row));
             Workbook.Save();
             return true;
         }
+
+        public bool DeleteChoreRow(Chore chore, Chore? foundChore)
+        {
+            if (foundChore == null || foundChore.Id <= 0)
+                throw new Exception($"Chore {chore} not found");
+            if (foundChore.Name.CompareTo(chore.Name) != 0)
+                throw new Exception($"Chore {chore} does not match found {foundChore}");
+
+            AddToJournal(null, chore);
+            Workbook.RemoveRow(SheetEnum.Main, chore.Id);
+            return true;
+        }
+
         void WriteChore(int row, Chore chore)
         {
             Workbook.Set(SheetEnum.Main, row, _colName, chore.Name);
@@ -68,11 +81,13 @@ namespace ChoreMgr.Data
         }
         public bool SaveChore(Chore chore, DateTime? oldLast)
         {
-            var oldChoreRow = FindChoreRow(chore.Id);
-            if (oldChoreRow <= 0)
-                throw new Exception($"Chore {chore} not found");
-            AddToJournal(chore, ReadChore(oldChoreRow));
-            WriteChore(oldChoreRow, chore);
+            var foundChore = ReadChore(chore.Row);
+            AddToJournal(chore, foundChore);
+            if (chore.IntervalDays == null && chore.LastDone != null)
+                DeleteChoreRow(chore, foundChore);
+            else
+                WriteChore(chore.Row, chore);
+
             Workbook.Save();
             return true;
         }
@@ -91,24 +106,6 @@ namespace ChoreMgr.Data
             Workbook.Set(SheetEnum.Journal, firstBlank, colJournalNote, Chore.DeltaString(oldChore, chore));
         }
 
-        private int FindChoreRow(int id)
-        {
-            return id;
-            /*
-            for (int iRow = 2; iRow < 1000; iRow++)
-            {
-                var name = Workbook.GetString(SheetEnum.Main, iRow, _colName);
-                if (string.IsNullOrWhiteSpace(name))
-                    break;
-
-                if (name.GetHashCode() == id)
-                    return iRow;
-            }
-            return null;
-            */
-        }
-
-
         IList<Chore> _chores;
         public IList<Chore> Chores
         {
@@ -116,17 +113,26 @@ namespace ChoreMgr.Data
             {
                 if (_chores == null)
                 {
-                    var chores = new List<Chore>();
-                    for (int row = 2; row < 1000; row++)
+                    try
                     {
-                        var chore = ReadChore(row);
-                        if (chore == null)
-                            break;
-                        if (chore.IntervalDays == null && chore.LastDone != null)
-                            continue;
-                        chores.Add(chore);
+                        var chores = new List<Chore>();
+                        for (int row = 2; row < 1000; row++)
+                        {
+                            var chore = ReadChore(row);
+                            if (chore == null)
+                                break;
+                            if (chore.IntervalDays == null && chore.LastDone != null)
+                                continue;
+                            chores.Add(chore);
+                        }
+                        _chores = chores.OrderBy(c => c.NextDo).ToList();
                     }
-                    _chores = chores.OrderBy(c => c.NextDo).ToList();
+                    catch (Exception ex)
+                    {
+                        DanLogger.Error("XlChoreMgrContext.Chores", ex);
+                        throw;
+                    }
+     
                 }
                 return _chores;
             }
