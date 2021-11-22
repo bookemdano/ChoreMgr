@@ -20,6 +20,13 @@ namespace ChoreMgr.Pages.Chores
             _context = context;
         }
 
+        public string ContextName
+        {
+            get
+            {
+                return _context.Name;
+            }
+        }
         public IList<Chore> ChoreList { get;set; }
 
         public void OnGetAsync()

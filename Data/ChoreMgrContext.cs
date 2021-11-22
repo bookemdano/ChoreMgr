@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ChoreMgr.Models;
-using OfficeOpenXml;
 
 namespace ChoreMgr.Data
 {
@@ -15,16 +14,18 @@ namespace ChoreMgr.Data
         static int _colLast = 6;
         static int _colNext = 7;
 
-        static int _colJournalDate = 1;
-        static int _colJournalName = 2;
-        static int _colJournalLast = 3;
-        static int _colJournalUpdated = 4;
-
         public XlChoreMgrContext(DbContextOptions<XlChoreMgrContext> options)
             : base(options)
         {
         }
 
+        public string Name
+        {
+            get
+            {
+                return Workbook.Name;
+            }
+        }
         private XlHelper _xlHelper;
         XlHelper Workbook
         {
@@ -44,6 +45,20 @@ namespace ChoreMgr.Data
             Workbook.Save();
             return true;
         }
+        public bool DeleteChore(Chore chore)
+        {
+            var choreRow = FindChoreRow(chore.Id);
+            if (choreRow <= 0)
+                throw new Exception($"Chore {chore} not found");
+            var foundName = Workbook.GetString(SheetEnum.Main, choreRow, _colName);
+            if (foundName.CompareTo(chore.Name) != 0)
+                throw new Exception($"Chore {chore} does not match row {choreRow}");
+
+            AddToJournal(null, chore);
+            Workbook.RemoveRow(SheetEnum.Main, choreRow);
+            Workbook.Save();
+            return true;
+        }
         void WriteChore(int row, Chore chore)
         {
             Workbook.Set(SheetEnum.Main, row, _colName, chore.Name);
@@ -54,24 +69,29 @@ namespace ChoreMgr.Data
         public bool SaveChore(Chore chore, DateTime? oldLast)
         {
             var oldChoreRow = FindChoreRow(chore.Id);
-            if (!oldChoreRow.HasValue)
-                return false;
-            WriteChore(oldChoreRow.Value, chore);
-            AddToJournal(chore, oldLast);
+            if (oldChoreRow <= 0)
+                throw new Exception($"Chore {chore} not found");
+            AddToJournal(chore, ReadChore(oldChoreRow));
+            WriteChore(oldChoreRow, chore);
             Workbook.Save();
             return true;
         }
 
-        void AddToJournal(Chore chore, DateTime? oldLast)
+        void AddToJournal(Chore? chore, Chore? oldChore)
         {
+            var colJournalUpdated = 1;
+            var colJournalName = 2;
+            var colJournalNote = 3;
             var firstBlank = Workbook.FirstBlank(SheetEnum.Journal);
-            Workbook.Set(SheetEnum.Journal, firstBlank, _colJournalDate, chore.LastDone);
-            Workbook.Set(SheetEnum.Journal, firstBlank, _colJournalName, chore.Name);
-            Workbook.Set(SheetEnum.Journal, firstBlank, _colJournalLast, oldLast);
-            Workbook.Set(SheetEnum.Journal, firstBlank, _colJournalUpdated, DateTime.Now);
+            Workbook.Set(SheetEnum.Journal, firstBlank, colJournalUpdated, DateTime.Now);
+            if (chore == null)
+                Workbook.Set(SheetEnum.Journal, firstBlank, colJournalName, oldChore?.Name);
+            else
+                Workbook.Set(SheetEnum.Journal, firstBlank, colJournalName, chore?.Name);
+            Workbook.Set(SheetEnum.Journal, firstBlank, colJournalNote, Chore.DeltaString(oldChore, chore));
         }
 
-        private int? FindChoreRow(int id)
+        private int FindChoreRow(int id)
         {
             return id;
             /*
@@ -99,13 +119,9 @@ namespace ChoreMgr.Data
                     var chores = new List<Chore>();
                     for (int row = 2; row < 1000; row++)
                     {
-                        var name = Workbook.GetString(SheetEnum.Main, row, _colName);
-                        if (string.IsNullOrWhiteSpace(name))
+                        var chore = ReadChore(row);
+                        if (chore == null)
                             break;
-
-                        var chore = new Chore(row, name);
-                        chore.IntervalDays = Workbook.GetInt(SheetEnum.Main, row, _colInterval);
-                        chore.LastDone = Workbook.GetDate(SheetEnum.Main, row, _colLast);
                         if (chore.IntervalDays == null && chore.LastDone != null)
                             continue;
                         chores.Add(chore);
@@ -114,6 +130,18 @@ namespace ChoreMgr.Data
                 }
                 return _chores;
             }
+        }
+
+        private Chore? ReadChore(int row)
+        {
+            var name = Workbook.GetString(SheetEnum.Main, row, _colName);
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
+
+            var chore = new Chore(row, name);
+            chore.IntervalDays = Workbook.GetInt(SheetEnum.Main, row, _colInterval);
+            chore.LastDone = Workbook.GetDate(SheetEnum.Main, row, _colLast);
+            return chore;
         }
 
         public override void Dispose()
@@ -128,88 +156,6 @@ namespace ChoreMgr.Data
         Main,
         Journal
 
-    }
-    class XlHelper : IDisposable
-    {
-        private ExcelPackage _package;
-        private ExcelWorkbook _book;
-
-        public XlHelper()
-        {
-            _package = GetPackage();
-            _book = _package.Workbook;
-        }
-        private Dictionary<SheetEnum, ExcelWorksheet> _sheets = new Dictionary<SheetEnum, ExcelWorksheet>();
-        ExcelWorksheet GetSheet(SheetEnum sheetEnum)
-        {
-            if (!_sheets.ContainsKey(sheetEnum))
-                _sheets[sheetEnum] = _book.Worksheets[sheetEnum.ToString()];
-            return _sheets[sheetEnum];
-        }
-
-#if DEBUG
-        public string Filename { get; } = @"c:\temp\Chores Copy.xlsm";
-#else
-        public string Filename { get; } = @"F:\OneDrive\Dan\Chores 2021.xlsm";
-#endif
-        ExcelPackage GetPackage()
-        {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            return new ExcelPackage(new FileInfo(Filename));
-        }
-        internal bool IsNull(SheetEnum sheetEnum, int row, int col)
-        {
-            return GetSheet(sheetEnum).Cells[row, col]?.Value == null;
-        }
-
-        internal int FirstBlank(SheetEnum sheetEnum)
-        {
-            for (int iRow = 2; iRow < 1000; iRow++)
-            {
-                if (IsNull(sheetEnum, iRow, 1))
-                    return iRow;
-            }
-            return -1;
-        }
-
-        public void Dispose()
-        {
-            _package?.Dispose();
-        }
-
-        internal void Save()
-        {
-            _package.Save();
-        }
-
-        internal void Set(SheetEnum sheetEnum, int row, int col, object? val)
-        {
-            GetSheet(sheetEnum).Cells[row, col].Value = val;
-        }
-        internal string GetString(SheetEnum sheetEnum, int row, int col)
-        {
-            var r = GetSheet(sheetEnum).Cells[row, col];
-            if (r?.Value == null)
-                return null;
-            return (string)r.Value;
-        }
-        internal DateTime? GetDate(SheetEnum sheetEnum, int row, int col)
-        {
-            var r = GetSheet(sheetEnum).Cells[row, col];
-            if (r?.Value == null)
-                return null;
-
-            return Convert.ToDateTime(r.Value);
-        }
-
-        internal int? GetInt(SheetEnum sheetEnum, int row, int col)
-        {
-            var r = GetSheet(sheetEnum).Cells[row, col];
-            if (r?.Value == null)
-                return null;
-
-            return Convert.ToInt32(r.Value);
-        }
     }
 
     public class ChoreMgrContext : DbContext

@@ -56,5 +56,21 @@ namespace ChoreMgr.Models
                     return "❕";
             }
         }
+        public override string ToString()
+        {
+            return $"{Name}({Id})";
+        }
+
+        static internal string DeltaString(Chore? oldChore, Chore? newChore)
+        {
+            var deltas = new List<string>();
+            if (newChore?.Name != oldChore?.Name)
+                deltas.Add($"Name Old:{oldChore?.Name} New:{newChore?.Name}");
+            if (newChore?.IntervalDays != oldChore?.IntervalDays)
+                deltas.Add($"Interval Old:{oldChore?.IntervalDays} New:{newChore?.IntervalDays}");
+            if (newChore?.LastDone != oldChore?.LastDone)
+                deltas.Add($"LastDone Old:{oldChore?.LastDone?.ToShortDateString()} New:{newChore?.LastDone?.ToShortDateString()}");
+            return String.Join("|", deltas);
+        }
     }
 }

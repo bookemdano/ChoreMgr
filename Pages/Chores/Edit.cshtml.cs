@@ -70,7 +70,14 @@ namespace ChoreMgr.Pages.Chores
             */
             return RedirectToPage("./Index");
         }
-
+        public IActionResult OnGetDelete(int id)
+        {
+            var chore = _context.Chores.FirstOrDefault(c => c.Id == id);
+            if (chore == null)
+                return Page();
+            _context.DeleteChore(chore);
+            return RedirectToPage("./Index");
+        }
         private bool ChoreExists(int id)
         {
             return _context.Chores.Any(e => e.Id == id);
