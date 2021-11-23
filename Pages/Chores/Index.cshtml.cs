@@ -33,9 +33,12 @@ namespace ChoreMgr.Pages.Chores
         {
             get
             {
-                return $"Due today: {_context.Chores.Count(j => j.NextDo?.Date == DateTime.Today)} " +
-                        $"Done: {_context.Chores.Count(j => j.LastDone >= DateTime.Today)} " +
-                        $"Past: {_context.Chores.Count(j => j.NextDo?.Date < DateTime.Today)}";
+                var today = DateTime.Today;
+                var yesterday = today.AddDays(-1);
+                return $"Due today: {_context.Chores.Count(j => j.NextDo?.Date == today)} " +
+                        $"Done Today: {_context.Journals.Count(j => j.DoneDate >= today)} " +
+                        $"Done Two Days: {_context.Journals.Count(j => j.DoneDate >= yesterday)} " +
+                        $"Past: {_context.Chores.Count(j => j.NextDo?.Date < today)}";
             }
         }
         public void OnGetAsync()

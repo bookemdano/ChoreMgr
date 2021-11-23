@@ -20,7 +20,6 @@ namespace ChoreMgr.Models
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
         public DateTime? LastDone { get; set; }
-
         [Display(Name = "Int")]
         public int? IntervalDays { get; set; }
         [Display(Name = "Next")]
@@ -55,6 +54,7 @@ namespace ChoreMgr.Models
                     return "❕";
             }
         }
+        public IList<Journal>? Journals { get; internal set; }
         public override string ToString()
         {
             return $"{Name}({Id})";

@@ -14,13 +14,13 @@ namespace ChoreMgr.Data
         {
             SheetName = "Journal";
             Updated = new XlField(SheetName, 1);
-            JobId = new XlField(SheetName, 2);
-            JobName = new XlField(SheetName, 3);
+            ChoreId = new XlField(SheetName, 2);
+            ChoreName = new XlField(SheetName, 3);
             Note = new XlField(SheetName, 4);
         }
         static public XlField Updated { get; }
-        static public XlField JobId { get; }
-        static public XlField JobName { get; }
+        static public XlField ChoreId { get; }
+        static public XlField ChoreName { get; }
         static public XlField Note { get; }
     }
     internal class MainSheet : BaseSheet
@@ -112,7 +112,7 @@ namespace ChoreMgr.Data
             if (chore.Id == 0)
             {
                 row = Workbook.FirstBlank(MainSheet.Id);
-                chore.Id = Math.Max(Workbook.Max(JournalSheet.JobId), Workbook.Max(MainSheet.Id)) + 1;
+                chore.Id = Math.Max(Workbook.Max(JournalSheet.ChoreId), Workbook.Max(MainSheet.Id)) + 1;
             }
             else
                 row = FindChoreRow(chore.Id);
@@ -143,10 +143,10 @@ namespace ChoreMgr.Data
         }
         void AddToJournal(Chore? chore, Chore? oldChore)
         {
-            var firstBlank = Workbook.FirstBlank(JournalSheet.JobId);
+            var firstBlank = Workbook.FirstBlank(JournalSheet.ChoreId);
             Workbook.Set(new XlCell(JournalSheet.Updated, firstBlank), DateTime.Now);
-            Workbook.Set(new XlCell(JournalSheet.JobId, firstBlank), chore?.Id ?? oldChore?.Id);
-            Workbook.Set(new XlCell(JournalSheet.JobName, firstBlank), chore?.Name ?? oldChore?.Name);
+            Workbook.Set(new XlCell(JournalSheet.ChoreId, firstBlank), chore?.Id ?? oldChore?.Id);
+            Workbook.Set(new XlCell(JournalSheet.ChoreName, firstBlank), chore?.Name ?? oldChore?.Name);
             Workbook.Set(new XlCell(JournalSheet.Note, firstBlank), Chore.DeltaString(oldChore, chore));
         }
 
@@ -236,8 +236,8 @@ namespace ChoreMgr.Data
 
             var rv = new Journal();
             rv.Updated = updated.Value;
-            rv.JobId = Workbook.GetInt(new XlCell(JournalSheet.JobId, row));
-            rv.JobName = Workbook.GetString(new XlCell(JournalSheet.JobName, row));
+            rv.ChoreId = Workbook.GetInt(new XlCell(JournalSheet.ChoreId, row));
+            rv.ChoreName = Workbook.GetString(new XlCell(JournalSheet.ChoreName, row));
             rv.Note = Workbook.GetString(new XlCell(JournalSheet.Note, row));
             return rv;
         }
