@@ -3,7 +3,8 @@
     public class Journal
     {
         public DateTime Updated { get; set; }
-        public string Name { get; set; }
-        public string Notes { get; set; }
+        public int? JobId { get; set; }
+        public string? JobName { get; set; }
+        public string? Note { get; set; }
     }
 }

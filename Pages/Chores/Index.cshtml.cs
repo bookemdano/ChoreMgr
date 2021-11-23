@@ -29,6 +29,15 @@ namespace ChoreMgr.Pages.Chores
         }
         public IList<Chore> ChoreList { get;set; }
 
+        public string TodayString
+        {
+            get
+            {
+                return $"Due today: {_context.Chores.Count(j => j.NextDo?.Date == DateTime.Today)} " +
+                        $"Done: {_context.Chores.Count(j => j.LastDone >= DateTime.Today)} " +
+                        $"Past: {_context.Chores.Count(j => j.NextDo?.Date < DateTime.Today)}";
+            }
+        }
         public void OnGetAsync()
         {
             ChoreList = _context.Chores.ToList();

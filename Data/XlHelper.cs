@@ -104,7 +104,7 @@ namespace ChoreMgr.Data
             var r = GetSheet(cell.SheetName).Cells[cell.Row, cell.Col];
             if (r?.Value == null)
                 return null;
-            return (string)r.Value;
+            return r.Value.ToString();
         }
         internal DateTime? GetDate(XlCell cell)
         {
@@ -131,5 +131,35 @@ namespace ChoreMgr.Data
         {
             GetSheet(cell.SheetName).DeleteRow(cell.Row);
         }
+    }
+    class BaseSheet
+    {
+        static internal string SheetName { get; set; }
+    }
+    class XlField
+    {
+        public XlField(XlField other)
+        {
+            SheetName = other.SheetName;
+            Col = other.Col;
+        }
+
+        public XlField(string sheetName, int col)
+        {
+            SheetName = sheetName;
+            Col = col;
+        }
+        public string SheetName { get; set; }
+        public int Col { get; set; }
+    }
+    class XlCell : XlField
+    {
+        public XlCell(XlField col, int? row) : base(col)
+        {
+            Row = row.Value;
+        }
+
+        public int Row { get; set; }
+
     }
 }
