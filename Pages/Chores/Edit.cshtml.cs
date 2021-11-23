@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ChoreMgr.Data;
+using ChoreMgr.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using ChoreMgr.Data;
-using ChoreMgr.Models;
 
 namespace ChoreMgr.Pages.Chores
 {
@@ -31,11 +25,11 @@ namespace ChoreMgr.Pages.Chores
             }
 
             Chore = _context.Chores.FirstOrDefault(m => m.Id == id);
-
             if (Chore == null)
             {
                 return NotFound();
             }
+            Chore.Journals = _context.Journals.Where(j => j.ChoreId == id).OrderByDescending(j => j.Updated).ToList();
             return Page();
         }
 

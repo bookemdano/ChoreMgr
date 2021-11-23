@@ -7,7 +7,7 @@
 
 <h1>Edit</h1>
 
-<h4>Chore</h4>
+<h4>Chore ID:@Model.Chore.Id</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -15,21 +15,17 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Chore.Id" />
             <div class="form-group">
-                <label asp-for="Chore.Id" class="control-label"></label>
-                @Html.TextBoxFor(m => m.Chore.Id, new { @readonly="readonly" })
-            </div>
-            <div class="form-group">
                 <label asp-for="Chore.Name" class="control-label"></label>
                 <input asp-for="Chore.Name" class="form-control" />
                 <span asp-validation-for="Chore.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Chore.IntervalDays" class="control-label"></label>
+                <label class="control-label">Interval (days)</label>
                 <input asp-for="Chore.IntervalDays" class="form-control" />
                 <span asp-validation-for="Chore.IntervalDays" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Chore.LastDone" class="control-label"></label>
+                <label class="control-label">Last Done</label>
                 <input asp-for="Chore.LastDone" class="form-control" />
                 <span asp-validation-for="Chore.LastDone" class="text-danger"></span>
             </div>
@@ -41,8 +37,43 @@
 </div>
 
 <div>
-    <a asp-page-handler="Delete" asp-route-id="@Model.Chore.Id">Delete</a>
     <a asp-page="./Index">Back to List</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Chore.Journals[0].Updated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Chore.Journals[0].DoneDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Chore.Journals[0].Note)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Chore.Journals) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Updated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Note)
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-page-handler="Delete" asp-route-id="@Model.Chore.Id">Delete</a>
 </div>
 
 @section Scripts {
