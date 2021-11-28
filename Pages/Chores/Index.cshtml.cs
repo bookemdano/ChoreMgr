@@ -29,16 +29,25 @@ namespace ChoreMgr.Pages.Chores
         }
         public IList<Chore> ChoreList { get;set; }
 
-        public string TodayString
+        public string Summary
         {
             get
             {
                 var today = DateTime.Today;
                 var yesterday = today.AddDays(-1);
+                var todayCount = _context.Journals.Count(j => j.DoneDate >= today);
+                var yesterdayCount = _context.Journals.Count(j => j.DoneDate >= yesterday) - todayCount;
+                return $"Done Today: {todayCount} " +
+                        $"Yesterday: {yesterdayCount}";
+            }
+        }
+        public string Pending
+        {
+            get
+            {
+                var today = DateTime.Today;
                 return $"Due today: {_context.Chores.Count(j => j.NextDo?.Date == today)} " +
-                        $"Done Today: {_context.Journals.Count(j => j.DoneDate >= today)} " +
-                        $"Done Two Days: {_context.Journals.Count(j => j.DoneDate >= yesterday)} " +
-                        $"Past: {_context.Chores.Count(j => j.NextDo?.Date < today)}";
+                        $"Past due: {_context.Chores.Count(j => j.NextDo?.Date < today)}";
             }
         }
         public void OnGetAsync()
