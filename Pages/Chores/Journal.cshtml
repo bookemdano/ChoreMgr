@@ -1,0 +1,77 @@
+﻿@page
+@model ChoreMgr.Pages.Chores.JournalModel
+
+@{
+    ViewData["Title"] = "Journal";
+}
+
+<h1>Journal</h1>
+ <table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DailyList[0].DoneDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DailyList[0].Count)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.DailyList) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Count)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.JournalList[0].Updated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.JournalList[0].ChoreId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.JournalList[0].ChoreName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.JournalList[0].DoneDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.JournalList[0].Note)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.JournalList) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Updated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ChoreId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ChoreName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Note)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
