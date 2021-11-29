@@ -7,29 +7,25 @@ namespace ChoreMgr.Pages.Chores
 {
     public class EditModel : PageModel
     {
-        private readonly XlChoreMgrContext _context;
+        private readonly ChoreService _service;
 
-        public EditModel(XlChoreMgrContext context)
+        public EditModel(ChoreService choreService)
         {
-            _context = context;
+            _service = choreService;
         }
 
         [BindProperty]
-        public Chore Chore { get; set; }
+        public Job Job { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(string id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            Chore = _context.Chores.FirstOrDefault(m => m.Id == id);
-            if (Chore == null)
-            {
+            Job = _service.GetJob(id);
+            if (Job == null)
                 return NotFound();
-            }
-            Chore.Journals = _context.Journals.Where(j => j.ChoreId == id).OrderByDescending(j => j.Updated).ToList();
+            Job.Logs = _service.GetJobLog().Where(j => j.JobId == id).OrderByDescending(j => j.Updated).ToList();
             return Page();
         }
 
@@ -41,40 +37,13 @@ namespace ChoreMgr.Pages.Chores
             {
                 return Page();
             }
-            _context.SaveChore(Chore);
-            /*
-             * old school
-            _context.Attach(Chore).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ChoreExists(Chore.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            */
+            _service.UpdateJob(Job.Id, Job);
             return RedirectToPage("./Index");
         }
-        public IActionResult OnGetDelete(int id)
+        public IActionResult OnGetDelete(string id)
         {
-            var chore = _context.Chores.FirstOrDefault(c => c.Id == id);
-            if (chore == null)
-                return Page();
-            _context.DeleteChore(chore);
+            _service.Remove(id);
             return RedirectToPage("./Index");
-        }
-        private bool ChoreExists(int id)
-        {
-            return _context.Chores.Any(e => e.Id == id);
         }
     }
 }

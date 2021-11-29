@@ -42,6 +42,10 @@ namespace ChoreMgr.Data
     }
     public class XlChoreMgrContext : DbContext
     {
+        public XlChoreMgrContext()
+        {
+
+        }
         public XlChoreMgrContext(DbContextOptions<XlChoreMgrContext> options)
             : base(options)
         {

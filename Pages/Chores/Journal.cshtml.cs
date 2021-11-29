@@ -13,42 +13,21 @@ namespace ChoreMgr.Pages.Chores
 {
     public class JournalModel : PageModel
     {
-        private readonly XlChoreMgrContext _context;
+        private readonly ChoreService _service;
 
-        public JournalModel(XlChoreMgrContext context)
+        public JournalModel(ChoreService choreService)
         {
-            _context = context;
+            _service = choreService;
         }
 
-        public IList<Journal> JournalList{ get;set; }
+        public IList<JobLog> JobLogList{ get;set; }
         public List<Daily> DailyList { get; private set; }
 
-        public string Summary
-        {
-            get
-            {
-                var today = DateTime.Today;
-                var yesterday = today.AddDays(-1);
-                var todayCount = _context.Journals.Count(j => j.DoneDate >= today);
-                var yesterdayCount = _context.Journals.Count(j => j.DoneDate >= yesterday) - todayCount;
-                return $"Done Today: {todayCount} " +
-                        $"Yesterday: {yesterdayCount}";
-            }
-        }
-        public string Pending
-        {
-            get
-            {
-                var today = DateTime.Today;
-                return $"Due today: {_context.Chores.Count(j => j.NextDo?.Date == today)} " +
-                        $"Past due: {_context.Chores.Count(j => j.NextDo?.Date < today)}";
-            }
-        }
         public void OnGetAsync()
         {
-            JournalList = _context.Journals.OrderByDescending(j => j.Updated).ToList();
+            JobLogList = _service.GetJobLog().OrderByDescending(j => j.Updated).ToList();
             var dailyList = new List<Daily>();
-            var byDay = JournalList.GroupBy(j => j.DoneDate);
+            var byDay = JobLogList.GroupBy(j => j.DoneDate);
             foreach (var day in byDay)
             {
                 if (day.Key == null)

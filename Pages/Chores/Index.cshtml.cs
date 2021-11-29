@@ -1,33 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ChoreMgr.Data;
+using ChoreMgr.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using ChoreMgr.Data;
-using ChoreMgr.Models;
-using OfficeOpenXml;
 
 namespace ChoreMgr.Pages.Chores
 {
     public class IndexModel : PageModel
     {
-        private readonly XlChoreMgrContext _context;
+        private readonly ChoreService _service;
 
-        public IndexModel(XlChoreMgrContext context)
+        public IndexModel(ChoreService choreService)
         {
-            _context = context;
+            _service = choreService;
         }
 
         public string ContextName
         {
             get
             {
-                return _context.Name;
+#if DEBUG
+                return "DEV";
+#else
+                return "PROD";
+#endif
             }
         }
-        public IList<Chore> ChoreList { get;set; }
+        public IList<Job> JobList { get;set; }
 
         public string Summary
         {
@@ -35,8 +33,9 @@ namespace ChoreMgr.Pages.Chores
             {
                 var today = DateTime.Today;
                 var yesterday = today.AddDays(-1);
-                var todayCount = _context.Journals.Count(j => j.DoneDate >= today);
-                var yesterdayCount = _context.Journals.Count(j => j.DoneDate >= yesterday) - todayCount;
+                var jobLogs = _service.GetJobLog();
+                var todayCount = jobLogs.Count(j => j.DoneDate >= today);
+                var yesterdayCount = jobLogs.Count(j => j.DoneDate >= yesterday) - todayCount;
                 return $"Done Today: {todayCount} " +
                         $"Yesterday: {yesterdayCount}";
             }
@@ -46,30 +45,55 @@ namespace ChoreMgr.Pages.Chores
             get
             {
                 var today = DateTime.Today;
-                return $"Due today: {_context.Chores.Count(j => j.NextDo?.Date == today)} " +
-                        $"Past due: {_context.Chores.Count(j => j.NextDo?.Date < today)}";
+                return $"Due today: {JobList.Count(j => j.NextDo?.Date == today)} " +
+                        $"Past due: {JobList.Count(j => j.NextDo?.Date < today)}";
             }
         }
         public void OnGetAsync()
         {
-            ChoreList = _context.Chores.ToList();
+            if (!_service.GetJobs().Any())
+                UpdateMongo();
+            JobList = _service.GetJobs().OrderBy(j => j.NextDo).ToList();
         }
-        public IActionResult OnGetToday(int id)
+        void UpdateMongo()
+        {
+            var context = new XlChoreMgrContext();
+            DanLogger.Log($"UpdateMongo() from:{context.Name} to:{_service.JobTableName}");
+            var choreList = context.Chores.ToList();
+            var jobs = _service.GetJobs();
+            foreach (var job in jobs)
+                _service.RemoveJob(job);
+            var jobLogs = _service.GetJobLog();
+            foreach (var jobLog in jobLogs)
+                _service.RemoveJobLog(jobLog.Id);
+
+            foreach (var chore in choreList)
+            {
+                var journals = context.Journals.Where(j => j.ChoreId == chore.Id);
+                var job = _service.CreateJob(Job.FromChore(chore));
+                foreach(var journal in journals)
+                {
+                    _service.CreateJobLog(JobLog.FromJournal(journal, job.Id));
+                }
+            }
+        }
+
+        public IActionResult OnGetToday(string id)
         {
             return UpdateChore(id, DateTime.Today);
         }
-        public IActionResult OnGetYesterday(int id)
+        public IActionResult OnGetYesterday(string id)
         {
             return UpdateChore(id, DateTime.Today.AddDays(-1));
         }
-        IActionResult UpdateChore(int id, DateTime date)
+        IActionResult UpdateChore(string id, DateTime date)
         {
-            var chore = _context.Chores.FirstOrDefault(c => c.Id == id);
-            if (chore == null)
+            var job = _service.GetJobs().FirstOrDefault(c => c.Id == id);
+            if (job == null)
                 return Page();
 
-            chore.LastDone = date;
-            _context.SaveChore(chore);
+            job.LastDone = date;
+            _service.UpdateJob(id, job);
 
             return RedirectToPage("./Index");
         }

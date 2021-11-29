@@ -1,14 +1,28 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChoreMgr.Models
 {
-    public class Journal
+    public class JobLog
     {
-        [DisplayFormat(DataFormatString = "{0:dd-MMM HH:mm:ss}")]
+        [BsonId]
+        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        public string Id { get; set; }
         public DateTime Updated { get; set; }
-        public int? ChoreId { get; set; }
-        public string? ChoreName { get; set; }
+        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        public string JobId { get; set; }
+        public string? JobName { get; set; }
         public string? Note { get; set; }
+
+        internal static JobLog FromJournal(Journal journal, string jobId)
+        {
+            var rv = new JobLog();
+            rv.JobId = jobId;
+            rv.JobName = journal.ChoreName; 
+            rv.Updated = journal.Updated;
+            rv.Note = journal.Note;
+            return rv;
+        }
 
         DateTime? _doneDate;
         [Display(Name = "Last")]
@@ -16,7 +30,7 @@ namespace ChoreMgr.Models
         [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
         public DateTime? DoneDate
         {
-            get 
+            get
             {
                 if (_doneDate == null)
                     _doneDate = CalcDoneDate();
@@ -52,10 +66,9 @@ namespace ChoreMgr.Models
             var last = src.IndexOf(end, first);
             if (last == -1)
                 return src.Substring(first);
-            
+
             return src.Substring(first, last - first);
 
         }
     }
-
 }

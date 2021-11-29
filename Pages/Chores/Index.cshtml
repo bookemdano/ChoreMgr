@@ -16,25 +16,25 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ChoreList[0].Status)
+                @Html.DisplayNameFor(model => model.JobList[0].Status)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ChoreList[0].Name)
+                @Html.DisplayNameFor(model => model.JobList[0].Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ChoreList[0].IntervalDays)
+                @Html.DisplayNameFor(model => model.JobList[0].IntervalDays)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ChoreList[0].LastDone)
+                @Html.DisplayNameFor(model => model.JobList[0].LastDone)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ChoreList[0].NextDo)
+                @Html.DisplayNameFor(model => model.JobList[0].NextDo)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.ChoreList) {
+@foreach (var item in Model.JobList) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Status)

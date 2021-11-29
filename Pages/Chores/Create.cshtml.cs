@@ -7,11 +7,11 @@ namespace ChoreMgr.Pages.Chores
 {
     public class CreateModel : PageModel
     {
-        private readonly XlChoreMgrContext _context;
+        private readonly ChoreService _service;
 
-        public CreateModel(XlChoreMgrContext context)
+        public CreateModel(ChoreService choreService)
         {
-            _context = context;
+            _service = choreService;
         }
 
         public IActionResult OnGet()
@@ -20,7 +20,7 @@ namespace ChoreMgr.Pages.Chores
         }
 
         [BindProperty]
-        public Chore Chore { get; set; }
+        public Job Job { get; set; }
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
@@ -30,7 +30,7 @@ namespace ChoreMgr.Pages.Chores
                 return Page();
             }
 
-            _context.AddChore(Chore);
+            _service.CreateJob(Job);
         
             return RedirectToPage("./Index");
         }

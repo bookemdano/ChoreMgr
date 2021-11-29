@@ -7,27 +7,27 @@
 
 <h1>Edit</h1>
 
-<h4>Chore ID:@Model.Chore.Id</h4>
+<h4>Job ID:@Model.Job.Id</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Chore.Id" />
+            <input type="hidden" asp-for="Job.Id" />
             <div class="form-group">
-                <label asp-for="Chore.Name" class="control-label"></label>
-                <input asp-for="Chore.Name" class="form-control" />
-                <span asp-validation-for="Chore.Name" class="text-danger"></span>
+                <label asp-for="Job.Name" class="control-label"></label>
+                <input asp-for="Job.Name" class="form-control" />
+                <span asp-validation-for="Job.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label class="control-label">Interval (days)</label>
-                <input asp-for="Chore.IntervalDays" class="form-control" />
-                <span asp-validation-for="Chore.IntervalDays" class="text-danger"></span>
+                <input asp-for="Job.IntervalDays" class="form-control" />
+                <span asp-validation-for="Job.IntervalDays" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label class="control-label">Last Done</label>
-                <input asp-for="Chore.LastDone" class="form-control" />
-                <span asp-validation-for="Chore.LastDone" class="text-danger"></span>
+                <input asp-for="Job.LastDone" class="form-control" />
+                <span asp-validation-for="Job.LastDone" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -44,19 +44,19 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Chore.Journals[0].Updated)
+                @Html.DisplayNameFor(model => model.Job.Logs[0].Updated)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Chore.Journals[0].DoneDate)
+                @Html.DisplayNameFor(model => model.Job.Logs[0].DoneDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Chore.Journals[0].Note)
+                @Html.DisplayNameFor(model => model.Job.Logs[0].Note)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Chore.Journals) {
+        @foreach (var item in Model.Job.Logs) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Updated)
@@ -73,7 +73,7 @@
 </table>
 
 <div>
-    <a asp-page-handler="Delete" asp-route-id="@Model.Chore.Id">Delete</a>
+    <a asp-page-handler="Delete" asp-route-id="@Model.Job.Id">Delete</a>
 </div>
 
 @section Scripts {
