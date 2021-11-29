@@ -51,31 +51,7 @@ namespace ChoreMgr.Pages.Chores
         }
         public void OnGetAsync()
         {
-            if (!_service.GetJobs().Any())
-                UpdateMongo();
             JobList = _service.GetJobs().OrderBy(j => j.NextDo).ToList();
-        }
-        void UpdateMongo()
-        {
-            var context = new XlChoreMgrContext();
-            DanLogger.Log($"UpdateMongo() from:{context.Name} to:{_service.JobTableName}");
-            var choreList = context.Chores.ToList();
-            var jobs = _service.GetJobs();
-            foreach (var job in jobs)
-                _service.RemoveJob(job);
-            var jobLogs = _service.GetJobLog();
-            foreach (var jobLog in jobLogs)
-                _service.RemoveJobLog(jobLog.Id);
-
-            foreach (var chore in choreList)
-            {
-                var journals = context.Journals.Where(j => j.ChoreId == chore.Id);
-                var job = _service.CreateJob(Job.FromChore(chore));
-                foreach(var journal in journals)
-                {
-                    _service.CreateJobLog(JobLog.FromJournal(journal, job.Id));
-                }
-            }
         }
 
         public IActionResult OnGetToday(string id)

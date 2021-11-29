@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using ChoreMgr.Data;
 using ChoreMgr.Models;
 using Microsoft.Extensions.Options;
@@ -8,8 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-
-builder.Services.AddDbContext<XlChoreMgrContext>();
 
 builder.Services.Configure<ChoreDatabaseSettings>(builder.Configuration.GetSection(nameof(ChoreDatabaseSettings)));
 
