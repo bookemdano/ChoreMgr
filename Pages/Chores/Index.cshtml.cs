@@ -40,8 +40,8 @@ namespace ChoreMgr.Pages.Chores
                 var today = DateTime.Today;
                 var yesterday = today.AddDays(-1);
                 var recentJobLogs = _service.GetJobLogs().Where(j => j.DoneDate >= yesterday);
-                var todayCount = recentJobLogs.Count(j => j.DoneDate >= today);
-                var yesterdayCount = recentJobLogs.Count() - todayCount;
+                var todayCount = recentJobLogs.Where(j => j.DoneDate >= today).DistinctBy(j => j.JobName).Count();
+                var yesterdayCount = recentJobLogs.Where(j => j.DoneDate >= yesterday && j.DoneDate < today).DistinctBy(j => j.JobName).Count();
                 return $"Done Today: {todayCount} " +
                         $"Yesterday: {yesterdayCount}";
             }
@@ -57,6 +57,8 @@ namespace ChoreMgr.Pages.Chores
         }
         public void OnGetAsync()
         {
+            DanLogger.Log($"{HttpContext.Request.Path} {ContextName}");
+
             JobList = _service.GetJobs().OrderBy(j => j.NextDo).ToList();
         }
 

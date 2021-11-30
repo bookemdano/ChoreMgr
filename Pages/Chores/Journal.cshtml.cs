@@ -1,5 +1,6 @@
 ﻿using ChoreMgr.Data;
 using ChoreMgr.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ChoreMgr.Pages.Chores
@@ -25,9 +26,13 @@ namespace ChoreMgr.Pages.Chores
             {
                 if (day.Key == null)
                     continue;
-                dailyList.Add(new Daily(day.Key.Value, day.Count()));
+                dailyList.Add(new Daily(day.Key.Value, day.DistinctBy(d => d.JobName).Count()));
             }
             DailyList = dailyList.OrderByDescending(d => d.DoneDate).ToList();
+        }
+        public void OnGetByDay(DateTime? date)
+        {
+            JobLogList = _service.GetJobLogs().Where(j => j.DoneDate == date).OrderBy(j => j.JobName).ToList();
         }
     }
 }

@@ -6,6 +6,8 @@
 }
 
 <h1>Journal</h1>
+@if(Model.DailyList != null)
+{
  <table class="table">
     <thead>
         <tr>
@@ -25,12 +27,13 @@
                 @Html.DisplayFor(modelItem => item.DoneDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Count)
+                <a asp-page-handler="ByDay" asp-route-date="@item.DoneDate">@Html.DisplayFor(modelItem => item.Count)</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+}
 
 <table class="table">
     <thead>

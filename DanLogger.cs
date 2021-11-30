@@ -4,7 +4,7 @@
     {
         static public void Log(object o)
         {
-            File.WriteAllText("endless.log", $"{DateTime.Now} {o} {Environment.NewLine}");
+            File.AppendAllText($"endless {DateTime.Now.ToString("yyyy-MM")}.log", $"{DateTime.Now} {o} {Environment.NewLine}");
         }
 
         internal static void Error(object o, Exception ex)
