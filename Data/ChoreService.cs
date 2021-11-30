@@ -7,8 +7,11 @@ namespace ChoreMgr.Data
     {
         private readonly IMongoCollection<Job> _jobs;
         private readonly IMongoCollection<JobLog> _jobLogs;
+        private IChoreDatabaseSettings _settings;
+
         public ChoreService(IChoreDatabaseSettings settings)
         {
+            _settings = settings;
             var client = new MongoClient(settings.ConnectionString);
             var db = client.GetDatabase(settings.DatabaseName);
 
@@ -20,10 +23,18 @@ namespace ChoreMgr.Data
             get
             {
                 var jobTableName = "Job";
-#if DEBUG
-                jobTableName = "dev_" + jobTableName;
-#endif
+                if (UseDevTables)
+                    jobTableName = "dev_" + jobTableName;
+    
                 return jobTableName;
+            }
+        }
+
+        public bool UseDevTables
+        {
+            get
+            {
+                return _settings.UseDevTables;
             }
         }
 
@@ -59,21 +70,30 @@ namespace ChoreMgr.Data
             LogAllJobs();
         }
 
-        public void Remove(string id)
+        public void RemoveJob(string id)
         {
             RemoveJob(GetJob(id));
         }
+
         #endregion
+
+        internal ChoreService CloneProd()
+        {
+            var prodSettings = new ChoreDatabaseSettings(_settings);
+            prodSettings.UseDevTables = false;
+            return new ChoreService(prodSettings);
+        }
 
         #region JobLog table
 
-        public List<JobLog> GetJobLog() => _jobLogs.Find(j => true).ToList();
+        public List<JobLog> GetJobLogs() => _jobLogs.Find(j => true).ToList();
 
         public JobLog CreateJobLog(JobLog jobLog)
         {
             _jobLogs.InsertOne(jobLog);
             return jobLog;
         }
+
         public void RemoveJobLog(string id) => _jobLogs.DeleteOne(j => j.Id == id);
 
         #endregion

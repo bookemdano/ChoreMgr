@@ -18,7 +18,7 @@ namespace ChoreMgr.Pages.Chores
 
         public void OnGetAsync()
         {
-            JobLogList = _service.GetJobLog().OrderByDescending(j => j.Updated).ToList();
+            JobLogList = _service.GetJobLogs().OrderByDescending(j => j.Updated).ToList();
             var dailyList = new List<Daily>();
             var byDay = JobLogList.GroupBy(j => j.DoneDate);
             foreach (var day in byDay)

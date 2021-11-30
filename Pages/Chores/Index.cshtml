@@ -7,6 +7,10 @@
 
 <h1>Chores from @Model.ContextName</h1>
 <p>
+    @if (Model.IsDebug)
+    {
+        <a asp-page-handler="ProdSync">Prod Sync</a>  <br />
+    }
     <a asp-page="./Journal">Summary: @Model.Summary</a> <br />
     Pending: @Model.Pending</p> 
 <p>

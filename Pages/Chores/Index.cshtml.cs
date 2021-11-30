@@ -18,11 +18,17 @@ namespace ChoreMgr.Pages.Chores
         {
             get
             {
-#if DEBUG
-                return "DEV";
-#else
-                return "PROD";
-#endif
+                if (_service.UseDevTables)
+                    return "DEV";
+                else
+                    return "PROD";
+            }
+        }
+        public bool IsDebug
+        {
+            get
+            {
+                return _service.UseDevTables;
             }
         }
         public IList<Job> JobList { get;set; }
@@ -33,7 +39,7 @@ namespace ChoreMgr.Pages.Chores
             {
                 var today = DateTime.Today;
                 var yesterday = today.AddDays(-1);
-                var jobLogs = _service.GetJobLog();
+                var jobLogs = _service.GetJobLogs();
                 var todayCount = jobLogs.Count(j => j.DoneDate >= today);
                 var yesterdayCount = jobLogs.Count(j => j.DoneDate >= yesterday) - todayCount;
                 return $"Done Today: {todayCount} " +
@@ -57,6 +63,22 @@ namespace ChoreMgr.Pages.Chores
         public IActionResult OnGetToday(string id)
         {
             return UpdateChore(id, DateTime.Today);
+        }
+        public IActionResult OnGetProdSync()
+        {
+            DanLogger.Log("OnGetProdSync");
+            _service.GetJobs().ForEach(j => _service.RemoveJob(j));
+            _service.GetJobLogs().ForEach(j => _service.RemoveJobLog(j.Id));
+            // copy prod context to dev context for testing
+            var prodService = _service.CloneProd();
+            var prodJobs = prodService.GetJobs();
+            foreach (var job in prodJobs)
+                _service.CreateJob(job);
+            var prodJobLogs = prodService.GetJobLogs();
+            foreach (var jobLog in prodJobLogs)
+                _service.CreateJobLog(jobLog);
+
+            return RedirectToPage("./Index");
         }
         public IActionResult OnGetYesterday(string id)
         {
