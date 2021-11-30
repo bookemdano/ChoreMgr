@@ -42,7 +42,7 @@ namespace ChoreMgr.Pages.Chores
         }
         public IActionResult OnGetDelete(string id)
         {
-            _service.RemoveJob(id);
+            _service.RemoveJob(id, true);
             return RedirectToPage("./Index");
         }
     }

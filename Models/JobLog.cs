@@ -27,6 +27,12 @@ namespace ChoreMgr.Models
                 return _doneDate;
             }
         }
+
+        public override string ToString()
+        {
+            return $"u:{Updated} name:{JobName} done:{DoneDate} note:{Note}";
+        }
+
         DateTime? CalcDoneDate()
         {
             if (Note == null)

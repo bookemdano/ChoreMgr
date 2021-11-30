@@ -39,9 +39,9 @@ namespace ChoreMgr.Pages.Chores
             {
                 var today = DateTime.Today;
                 var yesterday = today.AddDays(-1);
-                var jobLogs = _service.GetJobLogs();
-                var todayCount = jobLogs.Count(j => j.DoneDate >= today);
-                var yesterdayCount = jobLogs.Count(j => j.DoneDate >= yesterday) - todayCount;
+                var recentJobLogs = _service.GetJobLogs().Where(j => j.DoneDate >= yesterday);
+                var todayCount = recentJobLogs.Count(j => j.DoneDate >= today);
+                var yesterdayCount = recentJobLogs.Count() - todayCount;
                 return $"Done Today: {todayCount} " +
                         $"Yesterday: {yesterdayCount}";
             }
@@ -67,13 +67,13 @@ namespace ChoreMgr.Pages.Chores
         public IActionResult OnGetProdSync()
         {
             DanLogger.Log("OnGetProdSync");
-            _service.GetJobs().ForEach(j => _service.RemoveJob(j));
+            _service.GetJobs().ForEach(j => _service.RemoveJob(j, false));
             _service.GetJobLogs().ForEach(j => _service.RemoveJobLog(j.Id));
             // copy prod context to dev context for testing
             var prodService = _service.CloneProd();
             var prodJobs = prodService.GetJobs();
             foreach (var job in prodJobs)
-                _service.CreateJob(job);
+                _service.CreateJob(job, false);
             var prodJobLogs = prodService.GetJobLogs();
             foreach (var jobLog in prodJobLogs)
                 _service.CreateJobLog(jobLog);

@@ -44,11 +44,13 @@ namespace ChoreMgr.Data
 
         public Job GetJob(string id) => _jobs.Find<Job>(job => job.Id == id).FirstOrDefault();
 
-        public Job CreateJob(Job job)
+        public Job CreateJob(Job job, bool log)
         {
-            AddToJobLog(job, null);
+            if (log)
+                AddToJobLog(job, null);
             _jobs.InsertOne(job);
-            LogAllJobs();
+            if (log)
+                LogAllJobs();
             return job;
         }
 
@@ -57,22 +59,24 @@ namespace ChoreMgr.Data
             var foundJob = GetJob(id);
             AddToJobLog(job, foundJob);
             if (job.IntervalDays == null && job.LastDone != null)
-                RemoveJob(job);
+                RemoveJob(job, true);
             else
                 _jobs.ReplaceOne(j => j.Id == id, job);
     
             LogAllJobs();
         }
-        public void RemoveJob(Job job)
+        public void RemoveJob(Job job, bool log)
         {
-            AddToJobLog(null, job);
+            if (log)
+                AddToJobLog(null, job);
             _jobs.DeleteOne(j => j.Id == job.Id);
-            LogAllJobs();
+            if (log)
+                LogAllJobs();
         }
 
-        public void RemoveJob(string id)
+        public void RemoveJob(string id, bool log)
         {
-            RemoveJob(GetJob(id));
+            RemoveJob(GetJob(id), log);
         }
 
         #endregion
