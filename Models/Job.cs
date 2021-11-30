@@ -15,15 +15,6 @@ namespace ChoreMgr.Models
         [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
         public DateTime? LastDone { get; set; }
 
-        internal static Job FromChore(Chore chore)
-        {
-            var rv = new Job();
-            rv.Name = chore.Name;
-            rv.IntervalDays = chore.IntervalDays;
-            rv.LastDone = chore.LastDone;
-            return rv;
-        }
-
         [Display(Name = "Next")]
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MMM}")]

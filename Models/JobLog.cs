@@ -14,16 +14,6 @@ namespace ChoreMgr.Models
         public string? JobName { get; set; }
         public string? Note { get; set; }
 
-        internal static JobLog FromJournal(Journal journal, string jobId)
-        {
-            var rv = new JobLog();
-            rv.JobId = jobId;
-            rv.JobName = journal.ChoreName; 
-            rv.Updated = journal.Updated;
-            rv.Note = journal.Note;
-            return rv;
-        }
-
         DateTime? _doneDate;
         [Display(Name = "Last")]
         [DataType(DataType.Date)]
