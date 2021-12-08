@@ -1,7 +1,9 @@
 ﻿using ChoreMgr.Data;
 using ChoreMgr.Models;
+using ChoreMgr.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Newtonsoft.Json;
 
 namespace ChoreMgr.Pages.Chores
 {
@@ -28,7 +30,7 @@ namespace ChoreMgr.Pages.Chores
         {
             get
             {
-                return _service.UseDevTables;
+                return System.Diagnostics.Debugger.IsAttached;
             }
         }
         public IList<Job> JobList { get;set; }
@@ -80,6 +82,18 @@ namespace ChoreMgr.Pages.Chores
             foreach (var jobLog in prodJobLogs)
                 _service.CreateJobLog(jobLog);
 
+            return RedirectToPage("./Index");
+        }
+        public IActionResult OnGetBackup()
+        {
+            DanLogger.Log("OnGetBackup");
+            _service.Backup();
+            return RedirectToPage("./Index");
+        }
+        public IActionResult OnGetRestore()
+        {
+            DanLogger.Log("OnGetBackup");
+            _service.Restore();
             return RedirectToPage("./Index");
         }
         public IActionResult OnGetYesterday(string id)

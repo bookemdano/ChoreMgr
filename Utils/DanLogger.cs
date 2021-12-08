@@ -1,4 +1,4 @@
-﻿namespace ChoreMgr
+﻿namespace ChoreMgr.Utils
 {
     static public class DanLogger
     {
