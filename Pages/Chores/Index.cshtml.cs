@@ -104,7 +104,7 @@ namespace ChoreMgr.Pages.Chores
                 return Page();
 
             job.LastDone = date;
-            _service.UpdateJob(id, job);
+            _service.UpdateJob(job);
 
             return RedirectToPage("./Index");
         }

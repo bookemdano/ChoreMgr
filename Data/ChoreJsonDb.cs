@@ -51,7 +51,7 @@ namespace ChoreMgr.Data
         }
         bool WriteJsonDb<T>(IList<T> objs, string filename)
         {
-            var str = JsonConvert.SerializeObject(objs);
+            var str = JsonConvert.SerializeObject(objs, Formatting.Indented);
             File.WriteAllText(filename, str);
             return true;
         }
@@ -67,14 +67,26 @@ namespace ChoreMgr.Data
 
         public List<Job> GetJobs() => _jobs.ToList();
 
-        public Job? GetJob(string id) => _jobs.FirstOrDefault(job => job.Id == id);
+        public Job? GetJobFromDb(string? id)
+        {
+            if (id == null)
+                return null;
+            return ReadJsonDb<Job>().FirstOrDefault(job => job.Id == id);
+        }
+        public Job? GetJob(string id, bool includeLogs = false)
+        {
+            var job = _jobs.FirstOrDefault(job => job.Id == id);
+            if (job != null && includeLogs)
+                job.Logs = _jobLogs.Where(j => j.JobId == job.Id).OrderByDescending(j => j.Updated).ToList();
+            return job;
+        }
 
         public Job CreateJob(Job job, bool log)
         {
-            if (log)
-                AddToJobLog(job, null);
             if (job.Id == null)
                 job.Id = Guid.NewGuid().ToString();
+            if (log)
+                AddToJobLog(job, null);
             _jobs.Add(job);
             SaveJobs(log);
             return job;
@@ -85,9 +97,9 @@ namespace ChoreMgr.Data
             WriteJsonDb<Job>(_jobs, backup);
         }
 
-        public void UpdateJob(string id, Job job)
+        public void UpdateJob(Job job)
         {
-            var foundJob = GetJob(id);  Returns same job!// 
+            var foundJob = GetJobFromDb(job.Id); 
             AddToJobLog(job, foundJob);
             if (job.IntervalDays == null && job.LastDone != null)
                 RemoveJob(job, true);   // we are done with this job

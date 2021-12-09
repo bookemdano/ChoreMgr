@@ -22,10 +22,10 @@ namespace ChoreMgr.Pages.Chores
             if (id == null)
                 return NotFound();
 
-            Job = _service.GetJob(id);
-            if (Job == null)
+            var job = _service.GetJob(id, includeLogs: true);
+            if (job == null)
                 return NotFound();
-            Job.Logs = _service.GetJobLogs().Where(j => j.JobId == id).OrderByDescending(j => j.Updated).ToList();
+            Job = job;
             return Page();
         }
 
@@ -37,7 +37,7 @@ namespace ChoreMgr.Pages.Chores
             {
                 return Page();
             }
-            _service.UpdateJob(Job.Id, Job);
+            _service.UpdateJob(Job);
             return RedirectToPage("./Index");
         }
         public IActionResult OnGetDelete(string id)
