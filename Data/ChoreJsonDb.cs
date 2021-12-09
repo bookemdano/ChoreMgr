@@ -121,7 +121,7 @@ namespace ChoreMgr.Data
                 return;
             AddToJobLog(job, foundJob);
             if (job.IntervalDays == null && job.LastDone != null)
-                RemoveJob(job);   // we are done with this job
+                RemoveJob(foundJob);   // we are done with this job
             else if (foundJob != null)
             {
 

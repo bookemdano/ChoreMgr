@@ -3,7 +3,7 @@ using ChoreMgr.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ChoreMgr.Pages.Chores
+namespace ChoreMgr.Pages
 {
     public class JournalModel : PageModel
     {
