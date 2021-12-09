@@ -7,13 +7,13 @@ namespace ChoreMgr.Data
 {
     // mongo in container https://www.mongodb.com/compatibility/docker#:~:text=Running%20MongoDB%20as%20a%20Docker%20Container%20You%20can,version%20in%20detached%20mode%20%28as%20a%20background%20process%29.
     // docker run --name mongodb -d -p 27018:27017 -v F:\OneDrive\data\mongo\ChoreDB:/data/db mongo
-    public class ChoreService
+    public class ChoreMongo
     {
         private readonly IMongoCollection<Job> _jobs;
         private readonly IMongoCollection<JobLog> _jobLogs;
-        private IChoreDatabaseSettings _settings;
+        private IChoreMongoSettings _settings;
 
-        public ChoreService(IChoreDatabaseSettings settings)
+        public ChoreMongo(IChoreMongoSettings settings)
         {
             _settings = settings;
             var client = new MongoClient(settings.ConnectionString);
@@ -90,12 +90,12 @@ namespace ChoreMgr.Data
 
         #endregion
 
-        internal ChoreService CloneProd()
+        internal ChoreMongo CloneProd()
         {
-            var prodSettings = new ChoreDatabaseSettings(_settings);
+            var prodSettings = new ChoreMongoSettings(_settings);
             prodSettings.UseDevTables = false;
             prodSettings.ConnectionString = "mongodb://127.0.0.1:27017";
-            return new ChoreService(prodSettings);
+            return new ChoreMongo(prodSettings);
         }
 
         internal void Backup()

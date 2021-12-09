@@ -7,9 +7,9 @@ namespace ChoreMgr.Pages.Chores
 {
     public class CreateModel : PageModel
     {
-        private readonly ChoreService _service;
+        private readonly ChoreJsonDb _service;
 
-        public CreateModel(ChoreService choreService)
+        public CreateModel(ChoreJsonDb choreService)
         {
             _service = choreService;
         }

@@ -71,6 +71,13 @@ namespace ChoreMgr.Models
                 deltas.Add($"LastDone {OldNew(oldJob?.LastDone?.ToShortDateString(), newJob?.LastDone?.ToShortDateString())}");
             return String.Join("|", deltas);
         }
+
+        internal void Update(Job other)
+        {
+            Name = other.Name;
+            IntervalDays = other.IntervalDays;
+        }
+
         static string OldNew(object? oldOne, object? newOne)
         {
             var parts = new List<string>();

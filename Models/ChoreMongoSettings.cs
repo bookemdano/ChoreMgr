@@ -1,13 +1,13 @@
 ﻿namespace ChoreMgr.Models
 {
-    public class ChoreDatabaseSettings : IChoreDatabaseSettings
+    public class ChoreMongoSettings : IChoreMongoSettings
     {
-        public ChoreDatabaseSettings()
+        public ChoreMongoSettings()
         {
 
         }
 
-        public ChoreDatabaseSettings(IChoreDatabaseSettings other)
+        public ChoreMongoSettings(IChoreMongoSettings other)
         {
             ConnectionString = other.ConnectionString;
             DatabaseName = other.DatabaseName;
@@ -18,7 +18,7 @@
         public string DatabaseName { get; set; }
         public bool UseDevTables { get; set; }
     }
-    public interface IChoreDatabaseSettings
+    public interface IChoreMongoSettings
     {
         string ConnectionString { get; set; }
         string DatabaseName { get; set; }

@@ -8,12 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-builder.Services.Configure<ChoreDatabaseSettings>(builder.Configuration.GetSection(nameof(ChoreDatabaseSettings)));
+//builder.Services.Configure<ChoreMongoSettings>(builder.Configuration.GetSection(nameof(ChoreMongoSettings)));
+//builder.Services.AddSingleton<IChoreMongoSettings>(sp => sp.GetRequiredService<IOptions<ChoreMongoSettings>>().Value);
+//builder.Services.AddSingleton<ChoreMongo>();
 
-builder.Services.AddSingleton<IChoreDatabaseSettings>(sp => sp.GetRequiredService<IOptions<ChoreDatabaseSettings>>().Value);
+builder.Services.Configure<ChoreJsonDbSettings>(builder.Configuration.GetSection(nameof(ChoreJsonDbSettings)));
 
+builder.Services.AddSingleton<IChoreJsonDbSettings>(sp => sp.GetRequiredService<IOptions<ChoreJsonDbSettings>>().Value);
 
-builder.Services.AddSingleton<ChoreService>();
+builder.Services.AddSingleton<ChoreJsonDb>();
 
 var app = builder.Build();
 

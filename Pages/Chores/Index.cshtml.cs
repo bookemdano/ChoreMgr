@@ -9,9 +9,9 @@ namespace ChoreMgr.Pages.Chores
 {
     public class IndexModel : PageModel
     {
-        private readonly ChoreService _service;
+        private readonly ChoreJsonDb _service;
 
-        public IndexModel(ChoreService choreService)
+        public IndexModel(ChoreJsonDb choreService)
         {
             _service = choreService;
         }
@@ -20,10 +20,7 @@ namespace ChoreMgr.Pages.Chores
         {
             get
             {
-                if (_service.UseDevTables)
-                    return "DEV";
-                else
-                    return "PROD";
+                return _service.ToString();
             }
         }
         public bool IsDebug
@@ -74,7 +71,7 @@ namespace ChoreMgr.Pages.Chores
             _service.GetJobs().ForEach(j => _service.RemoveJob(j, false));
             _service.GetJobLogs().ForEach(j => _service.RemoveJobLog(j.Id));
             // copy prod context to dev context for testing
-            var prodService = _service.CloneProd();
+            var prodService = _service.CloneFromProd();
             var prodJobs = prodService.GetJobs();
             foreach (var job in prodJobs)
                 _service.CreateJob(job, false);
@@ -87,7 +84,7 @@ namespace ChoreMgr.Pages.Chores
         public IActionResult OnGetBackup()
         {
             DanLogger.Log("OnGetBackup");
-            _service.Backup();
+            //_service.Backup();
             return RedirectToPage("./Index");
         }
         public IActionResult OnGetRestore()
