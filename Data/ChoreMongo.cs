@@ -134,7 +134,7 @@ namespace ChoreMgr.Data
             jobLog.Updated = DateTime.Now;
             jobLog.JobId = job?.Id ?? oldJob?.Id;
             jobLog.JobName = job?.Name ?? oldJob?.Name;
-            jobLog.Note = Job.DeltaString(oldJob, job);
+            jobLog.Note = JobModel.DeltaString(oldJob, job);
             DanLogger.Log($"updated:{jobLog.Updated} id:{jobLog.JobId} name:{jobLog.JobName} note:{jobLog.Note}");
             CreateJobLog(jobLog);
         }
@@ -146,11 +146,8 @@ namespace ChoreMgr.Data
             outs.Add($"Id,Name,IntervalDays,LastDone,NextDo");
             var jobs = GetJobs();
             foreach (var job in jobs)
-                outs.Add($"{job.Id},{job.Name},{job.IntervalDays},{job.LastDone?.ToShortDateString()},{job.NextDo?.ToShortDateString()}");
-            File.WriteAllLines($"{JobTableName} {DateTime.Today.ToString("yyyy-MM-dd")}.csv", outs);
-            var dir = FileHelper.CreateDatedFolder(@"f:\onedrive\archive\ChoreMgr");
-            if (!Directory.EnumerateFiles(dir).Any())
-                Backup();
+                outs.Add($"{job.Id},{job.Name},{job.IntervalDays},{job.LastDone?.ToShortDateString()},{JobModel.CalcNextDo(job)?.ToShortDateString()}");
+            File.WriteAllLines(FileHelper.CreateDatedFilename(@"f:\onedrive\archive\ChoreMgr", JobTableName, ".csv"), outs);
 
         }
         #endregion 

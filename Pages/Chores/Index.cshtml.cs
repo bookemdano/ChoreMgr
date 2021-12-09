@@ -30,7 +30,7 @@ namespace ChoreMgr.Pages.Chores
                 return System.Diagnostics.Debugger.IsAttached;
             }
         }
-        public IList<Job> JobList { get;set; }
+        public IList<JobModel> JobList { get;set; }
 
         public string Summary
         {
@@ -58,7 +58,7 @@ namespace ChoreMgr.Pages.Chores
         {
             DanLogger.Log($"{HttpContext.Request.Path} {ContextName}");
 
-            JobList = _service.GetJobs().OrderBy(j => j.NextDo).ToList();
+            JobList = _service.GetJobModels().OrderBy(j => j.NextDo).ToList();
         }
 
         public IActionResult OnGetToday(string id)
@@ -68,29 +68,14 @@ namespace ChoreMgr.Pages.Chores
         public IActionResult OnGetProdSync()
         {
             DanLogger.Log("OnGetProdSync");
-            _service.GetJobs().ForEach(j => _service.RemoveJob(j, false));
-            _service.GetJobLogs().ForEach(j => _service.RemoveJobLog(j.Id));
-            // copy prod context to dev context for testing
-            var prodService = _service.CloneFromProd();
-            var prodJobs = prodService.GetJobs();
-            foreach (var job in prodJobs)
-                _service.CreateJob(job, false);
-            var prodJobLogs = prodService.GetJobLogs();
-            foreach (var jobLog in prodJobLogs)
-                _service.CreateJobLog(jobLog);
+            _service.ProdSync();
 
             return RedirectToPage("./Index");
         }
         public IActionResult OnGetBackup()
         {
             DanLogger.Log("OnGetBackup");
-            //_service.Backup();
-            return RedirectToPage("./Index");
-        }
-        public IActionResult OnGetRestore()
-        {
-            DanLogger.Log("OnGetBackup");
-            _service.Restore();
+            _service.Backup();
             return RedirectToPage("./Index");
         }
         public IActionResult OnGetYesterday(string id)
@@ -99,12 +84,12 @@ namespace ChoreMgr.Pages.Chores
         }
         IActionResult UpdateChore(string id, DateTime date)
         {
-            var job = _service.GetJobs().FirstOrDefault(c => c.Id == id);
-            if (job == null)
+            var jobModel = _service.GetJobModel(id);
+            if (jobModel == null)
                 return Page();
 
-            job.LastDone = date;
-            _service.UpdateJob(job);
+            jobModel.LastDone = date;
+            _service.UpdateJob(jobModel);
 
             return RedirectToPage("./Index");
         }

@@ -30,7 +30,7 @@ namespace ChoreMgr.Pages.Chores
                 return Page();
             }
 
-            _service.CreateJob(Job, true);
+            _service.CreateJob(Job);
         
             return RedirectToPage("./Index");
         }

@@ -5,16 +5,15 @@
     ViewData["Title"] = "Chores";
 }
 
-<h1>Chores from @Model.ContextName</h1>
+<h1>Chores </h1>
 <p>
-    @if (Model.IsDebug)
-    {
-        <div style="float: right">
+    <div style="float: right">
+        @if (Model.IsDebug)
+        {
             <a asp-page-handler="ProdSync">Prod Sync</a>  <br />
-            <a asp-page-handler="Backup">Backup</a>  <br />
-            //<a asp-page-handler="Restore">Restore</a>  <br />
-        </div>
-    }
+        }
+        <a asp-page-handler="Backup">Backup</a>  <br />
+    </div>
 
     <a asp-page="./Journal">Summary: @Model.Summary</a> <br />
     Pending: @Model.Pending</p> 
@@ -69,3 +68,5 @@
 }
     </tbody>
 </table>
+@Model.ContextName
+    

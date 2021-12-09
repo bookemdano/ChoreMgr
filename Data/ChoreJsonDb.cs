@@ -6,18 +6,29 @@ namespace ChoreMgr.Data
 {
     public class ChoreJsonDb
     {
-        private readonly IList<Job> _jobs;
-        private readonly IList<JobLog> _jobLogs;
+        private IList<Job>? _jobs;
+        private IList<JobLog>? _jobLogs;
         private IChoreJsonDbSettings _settings;
 
         public ChoreJsonDb(IChoreJsonDbSettings settings)
         {
             _settings = settings;
-
-            _jobs = ReadJsonDb<Job>();
-            _jobLogs = ReadJsonDb<JobLog>();
         }
 
+        IList<Job> GetJobs()
+        {
+            if (_jobs == null)
+                _jobs = ReadJsonDb<Job>();
+            return _jobs;
+
+        }
+        internal IList<JobLog> GetJobLogs()
+        {
+            if (_jobLogs == null)
+                _jobLogs = ReadJsonDb<JobLog>();
+            return _jobLogs;
+
+        }
         #region Low-level
         IList<T> ReadJsonDb<T>()
         {
@@ -38,14 +49,17 @@ namespace ChoreMgr.Data
                 prefix = "DEV_";
             return $"{prefix}{typeof(T).Name}";
         }
-        bool WriteJsonDb<T>(IList<T> objs, bool withBackup)
+        string ArchiveDirectory
         {
-            if (withBackup)
+            get
             {
-                var dir = FileHelper.CreateDatedFolder(Path.Combine(_settings.Directory, "archive"));
-                var ts = DateTime.Now.ToString("yyyyMMdd HHmmss");
-                WriteJsonDb<T>(objs, Path.Combine(dir, $"{GetFilename<T>()} {ts}.json"));
+                return Path.Combine(_settings.Directory, "archive");
             }
+        }
+        bool WriteJsonDb<T>(IList<T> objs)
+        {
+            // write backup
+            WriteJsonDb<T>(objs, FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<T>(), "json"));
 
             return WriteJsonDb<T>(objs, GetFile<T>());
         }
@@ -60,12 +74,12 @@ namespace ChoreMgr.Data
 
         public override string ToString()
         {
-            return $"Name:{_settings.Directory} UseDevTables:{_settings.UseDevTables}";
+            return $"Source:{_settings.Directory} UseDevTables:{_settings.UseDevTables}";
         }
 
         #region Job table
 
-        public List<Job> GetJobs() => _jobs.ToList();
+        public List<JobModel> GetJobModels() => GetJobs().Select(j => new JobModel(j)).ToList();
 
         public Job? GetJobFromDb(string? id)
         {
@@ -73,74 +87,65 @@ namespace ChoreMgr.Data
                 return null;
             return ReadJsonDb<Job>().FirstOrDefault(job => job.Id == id);
         }
-        public Job? GetJob(string id, bool includeLogs = false)
+
+        public JobModel? GetJobModel(string id, bool includeLogs = false)
         {
-            var job = _jobs.FirstOrDefault(job => job.Id == id);
-            if (job != null && includeLogs)
-                job.Logs = _jobLogs.Where(j => j.JobId == job.Id).OrderByDescending(j => j.Updated).ToList();
-            return job;
+            var job = GetJobs().FirstOrDefault(job => job.Id == id);
+            if (job == null)
+                return null;
+            var rv = new JobModel(job);
+            if (rv != null && includeLogs)
+                rv.Logs = _jobLogs.Where(j => j.JobId == job.Id).OrderByDescending(j => j.Updated).ToList();
+            return rv;
         }
 
-        public Job CreateJob(Job job, bool log)
+        public Job CreateJob(Job job)
         {
             if (job.Id == null)
                 job.Id = Guid.NewGuid().ToString();
-            if (log)
-                AddToJobLog(job, null);
-            _jobs.Add(job);
-            SaveJobs(log);
+            AddToJobLog(job, null);
+            GetJobs().Add(job);
+            SaveJobs();
             return job;
         }
 
-        private void SaveJobs(bool backup)
+        private void SaveJobs()
         {
-            WriteJsonDb<Job>(_jobs, backup);
+            WriteJsonDb<Job>(GetJobs());
         }
 
         public void UpdateJob(Job job)
         {
-            var foundJob = GetJobFromDb(job.Id); 
+            var foundJob = GetJobs().FirstOrDefault(j => j.Id == job.Id);
+            if (foundJob == null)
+                return;
             AddToJobLog(job, foundJob);
             if (job.IntervalDays == null && job.LastDone != null)
-                RemoveJob(job, true);   // we are done with this job
+                RemoveJob(job);   // we are done with this job
             else if (foundJob != null)
             {
+
                 foundJob.Update(job);
-                SaveJobs(true);
+                SaveJobs();
             }
         }
-        public void RemoveJob(Job job, bool log)
+        void RemoveJob(Job job)
         {
-            if (log)
-                AddToJobLog(null, job);
-            _jobs.Remove(job);
-            SaveJobs(log);
+            AddToJobLog(null, job);
+            GetJobs().Remove(job);
+            SaveJobs();
         }
 
-        public void RemoveJob(string id, bool log)
+        public void RemoveJob(string id)
         {
-            var job = GetJob(id);
+            var job = GetJobs().FirstOrDefault(job => job.Id == id);
             if (job != null)
-                RemoveJob(job, log);
+                RemoveJob(job);
         }
 
         #endregion
 
-        internal ChoreJsonDb CloneFromProd()
-        {
-            var prodSettings = new ChoreJsonDbSettings(_settings);
-            prodSettings.UseDevTables = false;
-            return new ChoreJsonDb(prodSettings);
-        }
-
-        internal void Restore()
-        {
-            throw new NotImplementedException("Uh, yeah- someone should write this.");
-        }
-
         #region JobLog table
-
-        public List<JobLog> GetJobLogs() => _jobLogs.ToList();
 
         public JobLog CreateJobLog(JobLog jobLog)
         {
@@ -161,10 +166,27 @@ namespace ChoreMgr.Data
 
         private void SaveJobLogs()
         {
-            WriteJsonDb<JobLog>(_jobLogs, true);
+            WriteJsonDb<JobLog>(_jobLogs);
         }
 
         #endregion
+        internal void ProdSync()
+        {
+            Backup();
+            // copy prod context to dev context for testing
+            var prodService = CloneFromProd();
+            WriteJsonDb<Job>(prodService.GetJobs());
+            WriteJsonDb<JobLog>(prodService.GetJobLogs());
+            _jobs = ReadJsonDb<Job>();
+            _jobLogs = ReadJsonDb<JobLog>();
+        }
+
+        ChoreJsonDb CloneFromProd()
+        {
+            var prodSettings = new ChoreJsonDbSettings(_settings);
+            prodSettings.UseDevTables = false;
+            return new ChoreJsonDb(prodSettings);
+        }
 
         #region Logging
         void AddToJobLog(Job? job, Job? oldJob)
@@ -173,11 +195,34 @@ namespace ChoreMgr.Data
             jobLog.Updated = DateTime.Now;
             jobLog.JobId = (job?.Id ?? oldJob?.Id)??"-";
             jobLog.JobName = job?.Name ?? oldJob?.Name;
-            jobLog.Note = Job.DeltaString(oldJob, job);
+            jobLog.Note = JobModel.DeltaString(oldJob, job);
             DanLogger.Log($"updated:{jobLog.Updated} id:{jobLog.JobId} name:{jobLog.JobName} note:{jobLog.Note}");
             CreateJobLog(jobLog);
         }
-        
+
+        internal void Backup()
+        {
+            DanLogger.Log($"Backup {this}");
+            File.WriteAllText(FileHelper.CreateDatedFilename(ArchiveDirectory, "notes", "txt"), $"Service:{this}");
+            WriteJsonDb<Job>(GetJobs(), FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Job>(), "json"));
+            WriteJsonDb<JobLog>(GetJobLogs(), FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<JobLog>(), "json"));
+
+            // to csv
+            var outs = new List<string>();
+            outs.Add($"Id,Name,IntervalDays,LastDone,NextDo");
+            var jobs = GetJobs();
+            foreach (var job in jobs)
+                outs.Add($"{job.Id},{job.Name},{job.IntervalDays},{job.LastDone?.ToShortDateString()},{JobModel.CalcNextDo(job)?.ToShortDateString()}");
+            File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Job>(), ".csv"), outs);
+
+            outs = new List<string>();
+            outs.Add($"Id,JobId,JobName,Note,DoneDate");
+            var jobLogs = GetJobLogs();
+            foreach (var jobLog in jobLogs)
+                outs.Add($"{jobLog.Id},{jobLog.JobId},{jobLog.JobName},{jobLog.Note},{jobLog.DoneDate?.ToShortDateString()}");
+            File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<JobLog>(), ".csv"), outs);
+
+        }
         #endregion 
     }
 }

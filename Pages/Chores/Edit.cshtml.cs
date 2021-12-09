@@ -15,17 +15,17 @@ namespace ChoreMgr.Pages.Chores
         }
 
         [BindProperty]
-        public Job Job { get; set; }
+        public JobModel JobModel { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
             if (id == null)
                 return NotFound();
 
-            var job = _service.GetJob(id, includeLogs: true);
-            if (job == null)
+            var jobModel = _service.GetJobModel(id, includeLogs: true);
+            if (jobModel == null)
                 return NotFound();
-            Job = job;
+            JobModel = jobModel;
             return Page();
         }
 
@@ -37,12 +37,12 @@ namespace ChoreMgr.Pages.Chores
             {
                 return Page();
             }
-            _service.UpdateJob(Job);
+            _service.UpdateJob(JobModel);
             return RedirectToPage("./Index");
         }
         public IActionResult OnGetDelete(string id)
         {
-            _service.RemoveJob(id, true);
+            _service.RemoveJob(id);
             return RedirectToPage("./Index");
         }
     }

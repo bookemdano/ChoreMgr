@@ -5,15 +5,52 @@ namespace ChoreMgr.Models
 {
     public class Job
     {
+        public Job()
+        {
+
+        }
+        public Job(Job? job)
+        {
+            if (job == null)
+                throw new ArgumentNullException(nameof(job));
+            Id = job.Id;
+            Name = job.Name;
+            IntervalDays = job.IntervalDays;
+            LastDone = job.LastDone;
+        }
+
         [BsonId]
         [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         public string? Id { get; set; }
         public string Name { get; set; }
         public int? IntervalDays { get; set; }
+
         [Display(Name = "Last")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
         public DateTime? LastDone { get; set; }
+
+        internal void Update(Job other)
+        {
+            Name = other.Name;
+            IntervalDays = other.IntervalDays;
+            LastDone = other.LastDone;
+        }
+
+        public override string ToString()
+        {
+            return $"{Name}({Id})";
+        }
+    }
+    public class JobModel : Job
+    {
+        public JobModel()
+        {
+        }
+
+        public JobModel(Job? job) : base(job)
+        {
+        }
 
         [Display(Name = "Next")]
         [DataType(DataType.Date)]
@@ -22,12 +59,7 @@ namespace ChoreMgr.Models
         {
             get
             {
-                if (LastDone.HasValue && !IntervalDays.HasValue)
-                    return null;    // it is not repeated and it has been done
-                else if (!LastDone.HasValue)
-                    return DateTime.Today.AddDays(.999);
-                else
-                    return LastDone.Value.Date.AddDays(IntervalDays.Value + .999);
+                return CalcNextDo(this);
             }
         }
 
@@ -51,11 +83,6 @@ namespace ChoreMgr.Models
         // only set when viewing details
         public List<JobLog>? Logs { get; internal set; }
 
-        public override string ToString()
-        {
-            return $"{Name}({Id})";
-        }
-
         static internal string DeltaString(Job? oldJob, Job? newJob)
         {
             var deltas = new List<string>();
@@ -67,15 +94,11 @@ namespace ChoreMgr.Models
                 deltas.Add($"Name {OldNew(oldJob?.Name, newJob?.Name)}");
             if (newJob?.IntervalDays != oldJob?.IntervalDays)
                 deltas.Add($"Interval {OldNew(oldJob?.IntervalDays, newJob?.IntervalDays)}");
-            if (newJob?.LastDone != oldJob?.LastDone)
-                deltas.Add($"LastDone {OldNew(oldJob?.LastDone?.ToShortDateString(), newJob?.LastDone?.ToShortDateString())}");
+            var oldDone = oldJob?.LastDone?.Date;
+            var newDone = newJob?.LastDone?.Date;
+            if (newDone != oldDone)
+                deltas.Add($"LastDone {OldNew(oldDone?.ToShortDateString(), newDone?.ToShortDateString())}");
             return String.Join("|", deltas);
-        }
-
-        internal void Update(Job other)
-        {
-            Name = other.Name;
-            IntervalDays = other.IntervalDays;
         }
 
         static string OldNew(object? oldOne, object? newOne)
@@ -86,6 +109,16 @@ namespace ChoreMgr.Models
             if (newOne != null)
                 parts.Add($"New:{newOne}");
             return String.Join(" ", parts);
+        }
+
+        internal static DateTime? CalcNextDo(Job job)
+        {
+            if (job.LastDone.HasValue && !job.IntervalDays.HasValue)
+                return null;    // it is not repeated and it has been done
+            else if (!job.LastDone.HasValue)
+                return DateTime.Today.AddDays(.999);
+            else
+                return job.LastDone.Value.Date.AddDays(job.IntervalDays.Value + .999);
         }
     }
 }
