@@ -1,5 +1,6 @@
 ﻿using ChoreMgr.Data;
 using ChoreMgr.Models;
+using ChoreMgr.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -19,6 +20,7 @@ namespace ChoreMgr.Pages
 
         public void OnGetAsync()
         {
+            DanLogger.LogView(HttpContext);
             JobLogList = _service.GetJobLogs().OrderByDescending(j => j.Updated).ToList();
             var dailyList = new List<Daily>();
             var byDay = JobLogList.GroupBy(j => j.DoneDate);
@@ -32,6 +34,7 @@ namespace ChoreMgr.Pages
         }
         public void OnGetByDay(DateTime? date)
         {
+            DanLogger.LogView(HttpContext);
             JobLogList = _service.GetJobLogs().Where(j => j.DoneDate == date).OrderBy(j => j.JobName).ToList();
         }
     }

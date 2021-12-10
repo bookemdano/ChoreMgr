@@ -7,6 +7,10 @@ using Newtonsoft.Json;
 
 namespace ChoreMgr.Pages
 {
+    // TODO Include user model
+    // TODO Add size to jobs
+    // TODO allow to run in IIS not at root
+
     public class IndexModel : PageModel
     {
         private readonly ChoreJsonDb _service;
@@ -56,27 +60,27 @@ namespace ChoreMgr.Pages
         }
         public void OnGetAsync()
         {
-            DanLogger.Log($"{HttpContext.Request.Path} {ContextName}");
+            DanLogger.LogView(HttpContext, ContextName);
 
             JobList = _service.GetJobModels().OrderBy(j => j.NextDo).ToList();
         }
 
-        public IActionResult OnGetToday(string id)
-        {
-            return UpdateChore(id, DateTime.Today);
-        }
         public IActionResult OnGetProdSync()
         {
-            DanLogger.Log("OnGetProdSync");
+            DanLogger.LogChange(HttpContext);
             _service.ProdSync();
 
             return RedirectToPage("./Index");
         }
         public IActionResult OnGetBackup()
         {
-            DanLogger.Log("OnGetBackup");
+            DanLogger.LogChange(HttpContext);
             _service.Backup();
             return RedirectToPage("./Index");
+        }
+        public IActionResult OnGetToday(string id)
+        {
+            return UpdateChore(id, DateTime.Today);
         }
         public IActionResult OnGetYesterday(string id)
         {
@@ -84,6 +88,7 @@ namespace ChoreMgr.Pages
         }
         IActionResult UpdateChore(string id, DateTime date)
         {
+            DanLogger.LogChange(HttpContext, date);
             var jobModel = _service.GetJobModel(id);
             if (jobModel == null)
                 return Page();

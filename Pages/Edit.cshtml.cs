@@ -1,5 +1,6 @@
 ﻿using ChoreMgr.Data;
 using ChoreMgr.Models;
+using ChoreMgr.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -19,6 +20,8 @@ namespace ChoreMgr.Pages
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
+            DanLogger.LogView(HttpContext);
+
             if (id == null)
                 return NotFound();
 
@@ -33,6 +36,8 @@ namespace ChoreMgr.Pages
         // For more details, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            DanLogger.LogChange(HttpContext, JobModel);
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -42,6 +47,7 @@ namespace ChoreMgr.Pages
         }
         public IActionResult OnGetDelete(string id)
         {
+            DanLogger.LogChange(HttpContext);
             _service.RemoveJob(id);
             return RedirectToPage("./Index");
         }

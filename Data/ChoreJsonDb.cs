@@ -196,7 +196,7 @@ namespace ChoreMgr.Data
             jobLog.JobId = (job?.Id ?? oldJob?.Id)??"-";
             jobLog.JobName = job?.Name ?? oldJob?.Name;
             jobLog.Note = JobModel.DeltaString(oldJob, job);
-            DanLogger.Log($"updated:{jobLog.Updated} id:{jobLog.JobId} name:{jobLog.JobName} note:{jobLog.Note}");
+            DanLogger.Log($"UPDATE ts:{jobLog.Updated} id:{jobLog.JobId} name:{jobLog.JobName} note:{jobLog.Note}");
             CreateJobLog(jobLog);
         }
 
