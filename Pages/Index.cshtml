@@ -29,7 +29,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.JobList[0].Name)
             </th>
-            <th>
+            <th style="text-align:center;">
                 @Html.DisplayNameFor(model => model.JobList[0].IntervalDays)
             </th>
             <th>
@@ -47,7 +47,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
-            <td>
+            <td style=@item.WebStyle>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>

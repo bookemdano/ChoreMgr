@@ -23,6 +23,7 @@ namespace ChoreMgr.Models
         [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         public string? Id { get; set; }
         public string Name { get; set; }
+        [Display(Name = "Days")]
         public int? IntervalDays { get; set; }
 
         [Display(Name = "Last")]
@@ -78,6 +79,19 @@ namespace ChoreMgr.Models
                     return "❌";
                 else
                     return "❕";
+            }
+        }
+
+        public string WebStyle
+        {
+            get
+            {
+                var rv = "text-align:center;";
+                if (IntervalDays == null)
+                    rv = rv + "background-color:lightblue;";
+                else if (IntervalDays == 1)
+                    rv = rv + "background-color:lightgreen;";
+                return rv;
             }
         }
         // only set when viewing details

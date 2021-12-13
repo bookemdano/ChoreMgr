@@ -8,6 +8,7 @@ namespace ChoreMgr.Models
         [BsonId]
         [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         public string Id { get; set; }
+        [DisplayFormat(DataFormatString = "{0:M/d H:mm}")]
         public DateTime Updated { get; set; }
         [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         public string JobId { get; set; }
@@ -15,7 +16,7 @@ namespace ChoreMgr.Models
         public string? Note { get; set; }
 
         DateTime? _doneDate;
-        [Display(Name = "Last")]
+        [Display(Name = "Last Done")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
         public DateTime? DoneDate
@@ -28,6 +29,12 @@ namespace ChoreMgr.Models
             }
         }
 
+        public string JobIdEnd()
+        {
+            if (JobId == null)
+                return null;
+            return JobId.Substring(JobId.Length - 6, 6);
+        }
         public override string ToString()
         {
             return $"u:{Updated} name:{JobName} done:{DoneDate} note:{Note}";
