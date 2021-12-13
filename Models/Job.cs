@@ -91,6 +91,8 @@ namespace ChoreMgr.Models
                     rv = rv + "background-color:lightblue;";
                 else if (IntervalDays == 1)
                     rv = rv + "background-color:lightgreen;";
+                else if (IntervalDays > 14)
+                    rv = rv + "background-color:peachpuff;";
                 return rv;
             }
         }
