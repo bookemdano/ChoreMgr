@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 
-namespace ChoreMgr.Pages
+namespace ChoreMgr.Pages.Chores
 {
     // TODO Include user model
     // TODO Add size to jobs

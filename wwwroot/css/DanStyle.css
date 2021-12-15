@@ -1,0 +1,10 @@
+﻿body {
+    font-family:'Maiandra GD','Luminari','Didot';
+    margin-left: 40px;
+    background-color:#f0ead6;
+}
+ul
+{
+    list-style-type:square;
+    list-style-image:url(cloverleaf_tiny.png);
+}

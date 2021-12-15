@@ -4,7 +4,7 @@ using ChoreMgr.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ChoreMgr.Pages
+namespace ChoreMgr.Pages.Chores
 {
     public class EditModel : PageModel
     {
