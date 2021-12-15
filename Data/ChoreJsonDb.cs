@@ -216,10 +216,10 @@ namespace ChoreMgr.Data
             File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Job>(), ".csv"), outs);
 
             outs = new List<string>();
-            outs.Add($"Id,JobId,JobName,Note,DoneDate");
+            outs.Add($"Id,Updated,JobId,JobName,Note,DoneDate");
             var jobLogs = GetJobLogs();
             foreach (var jobLog in jobLogs)
-                outs.Add($"{jobLog.Id},{jobLog.JobId},{jobLog.JobName},{jobLog.Note},{jobLog.DoneDate?.ToShortDateString()}");
+                outs.Add($"{jobLog.Id},{jobLog.Updated},{jobLog.JobId},{jobLog.JobName},{jobLog.Note},{jobLog.DoneDate?.ToShortDateString()}");
             File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<JobLog>(), ".csv"), outs);
 
         }
