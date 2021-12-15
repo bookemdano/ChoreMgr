@@ -11,7 +11,7 @@ namespace ChoreMgr.Pages.Chores
     // TODO Add size to jobs
     // TODO allow to run in IIS not at root
 
-    public class IndexModel : PageModel
+    public class IndexModel : BasePageModel
     {
         private readonly ChoreJsonDb _service;
 
@@ -94,7 +94,7 @@ namespace ChoreMgr.Pages.Chores
                 return Page();
 
             jobModel.LastDone = date;
-            _service.UpdateJob(jobModel);
+            _service.UpdateJob(jobModel, UserName);
 
             return RedirectToPage("./Index");
         }

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ChoreMgr.Pages.Chores
 {
-    public class CreateModel : PageModel
+    public class CreateModel : BasePageModel
     {
         private readonly ChoreJsonDb _service;
 
@@ -33,7 +33,7 @@ namespace ChoreMgr.Pages.Chores
                 return Page();
             }
 
-            _service.CreateJob(Job);
+            _service.CreateJob(Job, UserName);
         
             return RedirectToPage("./Index");
         }

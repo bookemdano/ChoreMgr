@@ -18,8 +18,17 @@ builder.Services.AddSingleton<IChoreJsonDbSettings>(sp => sp.GetRequiredService<
 
 builder.Services.AddSingleton<ChoreJsonDb>();
 
+builder.Services.AddAuthentication().AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+}); 
+
 var app = builder.Build();
 
+
+app.MapGet("GoogleSignin", () => ChoreMgr.Pages.IndexModel.GoogleSignin());
+app.MapGet("signin-google", () => ChoreMgr.Pages.IndexModel.GoogleSignin());
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -29,6 +38,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();

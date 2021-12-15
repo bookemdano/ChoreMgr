@@ -4,15 +4,27 @@
 }
 <!DOCTYPE html>
 <html>
-
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+        function onSignIn(googleUser) {
+          var profile = googleUser.getBasicProfile();
+          console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+          console.log('Name: ' + profile.getName());
+          console.log('Image URL: ' + profile.getImageUrl());
+          console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+          //window.location.href = '@Url.Action("GoogleSignin")';
+        }
+    </script>
 <head>
     <title>Barefoot Homepage</title>
     <link rel="stylesheet" href="css/DanStyle.css" type="text/css"> 
 	<link rel="shortcut icon" href="home.ico">
 </head>
-
+<meta name="robots" content="noindex">
+<meta name="google-signin-client_id" content="550330438289-q8uqrnv9p4b796b1fm7382jukrlmvbid.apps.googleusercontent.com">
 <body>
     <h1>Simplest Home Page</h1>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
     <div style ="float:right;width:300px">
         <iframe src="http://free.timeanddate.com/clock/i3a2durd/n419/fn8/fs16/bas2/bacfff/pa8/tt0/tw1/tm1/th1/ta1/tb4" border="0" width="183" height="56" style="margin-left: 40px"></iframe>
     </div>

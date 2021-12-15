@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ChoreMgr.Pages.Chores
 {
-    public class JournalModel : PageModel
+    public class JournalModel : BasePageModel
     {
         private readonly ChoreJsonDb _service;
 

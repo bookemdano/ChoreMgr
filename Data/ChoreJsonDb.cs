@@ -99,11 +99,11 @@ namespace ChoreMgr.Data
             return rv;
         }
 
-        public Job CreateJob(Job job)
+        public Job CreateJob(Job job, string? userName)
         {
             if (job.Id == null)
                 job.Id = Guid.NewGuid().ToString();
-            AddToJobLog(job, null);
+            AddToJobLog(job, null, userName);
             GetJobs().Add(job);
             SaveJobs();
             return job;
@@ -114,14 +114,14 @@ namespace ChoreMgr.Data
             WriteJsonDb<Job>(GetJobs());
         }
 
-        public void UpdateJob(Job job)
+        public void UpdateJob(Job job, string? userName)
         {
             var foundJob = GetJobs().FirstOrDefault(j => j.Id == job.Id);
             if (foundJob == null)
                 return;
-            AddToJobLog(job, foundJob);
+            AddToJobLog(job, foundJob, userName);
             if (job.IntervalDays == null && job.LastDone != null)
-                RemoveJob(foundJob);   // we are done with this job
+                RemoveJob(foundJob, userName);   // we are done with this job
             else if (foundJob != null)
             {
 
@@ -129,18 +129,18 @@ namespace ChoreMgr.Data
                 SaveJobs();
             }
         }
-        void RemoveJob(Job job)
+        void RemoveJob(Job job, string? userName)
         {
-            AddToJobLog(null, job);
+            AddToJobLog(null, job, userName);
             GetJobs().Remove(job);
             SaveJobs();
         }
 
-        public void RemoveJob(string id)
+        public void RemoveJob(string id, string? userName)
         {
             var job = GetJobs().FirstOrDefault(job => job.Id == id);
             if (job != null)
-                RemoveJob(job);
+                RemoveJob(job, userName);
         }
 
         #endregion
@@ -189,14 +189,15 @@ namespace ChoreMgr.Data
         }
 
         #region Logging
-        void AddToJobLog(Job? job, Job? oldJob)
+        void AddToJobLog(Job? job, Job? oldJob, string? userName)
         {
             var jobLog = new JobLog();
             jobLog.Updated = DateTime.Now;
             jobLog.JobId = (job?.Id ?? oldJob?.Id)??"-";
             jobLog.JobName = job?.Name ?? oldJob?.Name;
             jobLog.Note = JobModel.DeltaString(oldJob, job);
-            DanLogger.Log($"UPDATE ts:{jobLog.Updated} id:{jobLog.JobId} name:{jobLog.JobName} note:{jobLog.Note}");
+            jobLog.User = userName;
+            DanLogger.Log($"UPDATE ts:{jobLog.Updated} id:{jobLog.JobId} name:{jobLog.JobName} note:{jobLog.Note} user:{jobLog.User}");
             CreateJobLog(jobLog);
         }
 
@@ -216,10 +217,10 @@ namespace ChoreMgr.Data
             File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Job>(), ".csv"), outs);
 
             outs = new List<string>();
-            outs.Add($"Id,Updated,JobId,JobName,Note,DoneDate");
+            outs.Add($"Id,Updated,JobId,JobName,Note,DoneDate,User");
             var jobLogs = GetJobLogs();
             foreach (var jobLog in jobLogs)
-                outs.Add($"{jobLog.Id},{jobLog.Updated},{jobLog.JobId},{jobLog.JobName},{jobLog.Note},{jobLog.DoneDate?.ToShortDateString()}");
+                outs.Add($"{jobLog.Id},{jobLog.Updated},{jobLog.JobId},{jobLog.JobName},{jobLog.Note},{jobLog.DoneDate?.ToShortDateString()},{jobLog.User}");
             File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<JobLog>(), ".csv"), outs);
 
         }

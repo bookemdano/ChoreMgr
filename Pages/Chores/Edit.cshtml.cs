@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ChoreMgr.Pages.Chores
 {
-    public class EditModel : PageModel
+    public class EditModel : BasePageModel
     {
         private readonly ChoreJsonDb _service;
 
@@ -42,13 +42,13 @@ namespace ChoreMgr.Pages.Chores
             {
                 return Page();
             }
-            _service.UpdateJob(JobModel);
+            _service.UpdateJob(JobModel, UserName);
             return RedirectToPage("./Index");
         }
         public IActionResult OnGetDelete(string id)
         {
             DanLogger.LogChange(HttpContext);
-            _service.RemoveJob(id);
+            _service.RemoveJob(id, UserName);
             return RedirectToPage("./Index");
         }
     }

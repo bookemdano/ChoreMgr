@@ -14,6 +14,7 @@ namespace ChoreMgr.Models
         public string JobId { get; set; }
         public string? JobName { get; set; }
         public string? Note { get; set; }
+        public string? User { get; set; }
 
         DateTime? _doneDate;
         [Display(Name = "Last Done")]
