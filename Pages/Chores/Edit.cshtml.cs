@@ -21,6 +21,8 @@ namespace ChoreMgr.Pages.Chores
         public async Task<IActionResult> OnGetAsync(string id)
         {
             DanLogger.LogView(HttpContext);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
 
             if (id == null)
                 return NotFound();

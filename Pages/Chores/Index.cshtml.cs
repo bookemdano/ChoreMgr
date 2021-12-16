@@ -68,6 +68,8 @@ namespace ChoreMgr.Pages.Chores
         public IActionResult OnGetProdSync()
         {
             DanLogger.LogChange(HttpContext);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
             _service.ProdSync();
 
             return RedirectToPage("./Index");
@@ -75,6 +77,8 @@ namespace ChoreMgr.Pages.Chores
         public IActionResult OnGetBackup()
         {
             DanLogger.LogChange(HttpContext);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
             _service.Backup();
             return RedirectToPage("./Index");
         }
@@ -89,6 +93,8 @@ namespace ChoreMgr.Pages.Chores
         IActionResult UpdateChore(string id, DateTime date)
         {
             DanLogger.LogChange(HttpContext, date);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
             var jobModel = _service.GetJobModel(id);
             if (jobModel == null)
                 return Page();

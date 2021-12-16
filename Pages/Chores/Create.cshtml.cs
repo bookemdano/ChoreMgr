@@ -28,6 +28,8 @@ namespace ChoreMgr.Pages.Chores
         public async Task<IActionResult> OnPostAsync()
         {
             DanLogger.LogChange(HttpContext, Job);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
             if (!ModelState.IsValid)
             {
                 return Page();

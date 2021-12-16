@@ -12,6 +12,7 @@
           console.log('Name: ' + profile.getName());
           console.log('Image URL: ' + profile.getImageUrl());
           console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+          document.cookie = "userName=" + profile.getEmail();
           //window.location.href = '@Url.Action("GoogleSignin")';
         }
     </script>
@@ -21,7 +22,7 @@
 	<link rel="shortcut icon" href="home.ico">
 </head>
 <meta name="robots" content="noindex">
-<meta name="google-signin-client_id" content="550330438289-q8uqrnv9p4b796b1fm7382jukrlmvbid.apps.googleusercontent.com">
+<meta name="google-signin-client_id" content="550330438289-oce2vdfr02dogk75hq379n01ri64dm7n.apps.googleusercontent.com">
 <body>
     <h1>Simplest Home Page</h1>
     <div class="g-signin2" data-onsuccess="onSignIn"></div>
