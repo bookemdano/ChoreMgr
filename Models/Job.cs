@@ -17,6 +17,7 @@ namespace ChoreMgr.Models
             Name = job.Name;
             IntervalDays = job.IntervalDays;
             LastDone = job.LastDone;
+            ForWhom = job.ForWhom;
         }
 
         [BsonId]
@@ -31,17 +32,34 @@ namespace ChoreMgr.Models
         [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
         public DateTime? LastDone { get; set; }
 
+        [Display(Name = "Who")]
+        public string? ForWhom { get; set; }
+
         internal void Update(Job other)
         {
             Name = other.Name;
             IntervalDays = other.IntervalDays;
             LastDone = other.LastDone;
+            ForWhom = other.ForWhom;
         }
 
         public override string ToString()
         {
-            return $"{Name}({Id})";
+            var rv = $"{Name}({Id})";
+            if (ForWhom != null)
+                rv += $"[{ForWhom}]";
+            return rv;
         }
+
+        internal static string CsvHeader()
+        {
+            return $"Id,Name,ForWhom,IntervalDays,LastDone,NextDo";
+        }
+        internal string ToCsv()
+        {
+            return $"{Id},{Name},{ForWhom},{IntervalDays},{LastDone?.ToShortDateString()},{JobModel.CalcNextDo(this)?.ToShortDateString()}";
+        }
+
     }
     public class JobModel : Job
     {
@@ -64,6 +82,12 @@ namespace ChoreMgr.Models
             }
         }
 
+        internal bool ChildOnly()
+        {
+            if (ForWhom == null)
+                return false;
+            return ForWhom.Contains('C', StringComparison.OrdinalIgnoreCase);
+        }
 
         [Display(Name = "S")]
         public string Status

@@ -58,11 +58,28 @@ namespace ChoreMgr.Pages.Chores
                         $"Past due: {JobList.Count(j => j.NextDo?.Date < today)}";
             }
         }
-        public void OnGetAsync()
+        string GetFromSession(string key, string def)
+        {
+            if (!HttpContext.Session.Keys.Contains(key))
+                return def;
+
+            var rv = HttpContext.Session.GetString(key);
+            if (string.IsNullOrEmpty(rv))
+                return def;
+            return rv;
+        }
+        public void OnGetAsync(string? forWhom)
         {
             DanLogger.LogView(HttpContext, ContextName);
-
-            JobList = _service.GetJobModels().OrderBy(j => j.NextDo).ToList();
+            if (forWhom == null)
+                forWhom = GetFromSession("ForWhom", "A");
+            if (forWhom == "D")
+                JobList = _service.GetJobModels().Where(j => !j.ChildOnly()).OrderBy(j => j.NextDo).ToList();
+            else if (forWhom == "C")
+                JobList = _service.GetJobModels().Where(j => j.ChildOnly()).OrderBy(j => j.NextDo).ToList();
+            else
+                JobList = _service.GetJobModels().OrderBy(j => j.NextDo).ToList();
+            HttpContext.Session.SetString("ForWhom", forWhom);
         }
 
         public IActionResult OnGetProdSync()

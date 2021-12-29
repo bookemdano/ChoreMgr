@@ -17,7 +17,7 @@ builder.Services.Configure<ChoreJsonDbSettings>(builder.Configuration.GetSection
 builder.Services.AddSingleton<IChoreJsonDbSettings>(sp => sp.GetRequiredService<IOptions<ChoreJsonDbSettings>>().Value);
 
 builder.Services.AddSingleton<ChoreJsonDb>();
-
+builder.Services.AddSession();
 builder.Services.AddAuthentication().AddGoogle(googleOptions =>
 {
     googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
@@ -35,7 +35,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
 }
 app.UseStaticFiles();
-
+app.UseSession();
 app.UseRouting();
 
 app.UseAuthentication();

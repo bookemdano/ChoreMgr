@@ -21,7 +21,10 @@
     <a asp-page="./Journal">Summary: @Model.Summary</a> <br />
     Pending: @Model.Pending</p> 
 <p>
-    <a asp-page="Create">Create New</a>
+    <a asp-page="Create">Create New</a> |
+    <a asp-page="./Index" asp-route-forWhom="D">D</a>
+    <a asp-page="./Index" asp-route-forWhom="C">C</a>
+    <a asp-page="./Index" asp-route-forWhom="A">A</a>
 </p>
 <table class="table">
     <thead>
@@ -31,6 +34,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.JobList[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.JobList[0].ForWhom)
             </th>
             <th style="text-align:center;">
                 @Html.DisplayNameFor(model => model.JobList[0].IntervalDays)
@@ -53,7 +59,10 @@
             <td style=@item.WebStyle>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-            <td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.ForWhom)
+            </td>
+            <td style="text-align:center;">
                 @Html.DisplayFor(modelItem => item.IntervalDays)
             </td>
             <td>

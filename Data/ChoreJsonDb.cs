@@ -210,10 +210,8 @@ namespace ChoreMgr.Data
 
             // to csv
             var outs = new List<string>();
-            outs.Add($"Id,Name,IntervalDays,LastDone,NextDo");
-            var jobs = GetJobs();
-            foreach (var job in jobs)
-                outs.Add($"{job.Id},{job.Name},{job.IntervalDays},{job.LastDone?.ToShortDateString()},{JobModel.CalcNextDo(job)?.ToShortDateString()}");
+            outs.Add(Job.CsvHeader());
+            outs.AddRange(GetJobs().Select(j => j.ToCsv()));
             File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Job>(), ".csv"), outs);
 
             outs = new List<string>();
