@@ -6,12 +6,12 @@ namespace ChoreMgr.Utils
     {
         static public void Log(object o)
         {
-            File.AppendAllText($"endless {DateTime.Now.ToString("yyyy-MM")}.log", $"{DateTime.Now} {o} {Environment.NewLine}");
+            File.AppendAllText($"endless {DateTime.Now.ToString("yyyyMM")}.log", $"{DateTime.Now} {o} {Environment.NewLine}");
         }
 
         internal static void Error(object o, Exception ex)
         {
-            Log($"{o} {ex.Message} {ex}");
+            Log($"ERROR {o} {ex?.Message} {ex}");
         }
 
         internal static void LogChange(HttpContext context, object? obj = null)

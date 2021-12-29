@@ -9,19 +9,21 @@ namespace ChoreMgr.Pages
         {
             get
             {
-                return HttpContext.Request.Cookies["userName"];
-
-                //return HttpContext.Request.HttpContext.Connection.RemoteIpAddress?.ToString(); 
+                var rv = HttpContext.Request.Cookies["userName"];
+                if (string.IsNullOrEmpty(rv))
+                    rv = HttpContext.Request.HttpContext.Connection.RemoteIpAddress?.ToString();
+                return rv;
             }
         }
         protected bool IsAuthed()
         {
             var userName = UserName;
-            if (userName == null)
-                return false;
-            var rv = (userName.EndsWith("francis@gmail.com") || userName == "bookemdano@gmail.com");
+            var rv = (userName?.StartsWith("192.168.86") == true || userName?.EndsWith("francis@gmail.com") == true || userName == "bookemdano@gmail.com");
             if (rv == false)
-                DanLogger.Log("Unauthorized access! u:" + userName);
+            {
+                var headers = HttpContext.Request.Headers.Select(h => $"{h.Key}={h.Value}");
+                DanLogger.Error($"Unauthorized access! u:{userName} h:{string.Join(",", headers)}", null);
+            }
             return rv;
         }
     }
