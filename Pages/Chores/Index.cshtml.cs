@@ -9,7 +9,7 @@ namespace ChoreMgr.Pages.Chores
 {
     // TODO Include user model
     // TODO Add size to jobs
-    // TODO allow to run in IIS not at root
+    // TODONE allow to run in IIS not at root
 
     public class IndexModel : BasePageModel
     {
@@ -35,6 +35,9 @@ namespace ChoreMgr.Pages.Chores
             }
         }
         public IList<JobModel> JobList { get; set; }
+
+        [BindProperty] 
+        public string ExcludeList { get; set; }
 
         public string Summary
         {
@@ -68,18 +71,26 @@ namespace ChoreMgr.Pages.Chores
                 return def;
             return rv;
         }
+        void SetToSession(string key, string? val)
+        {
+            if (string.IsNullOrWhiteSpace(val))
+                HttpContext.Session.Remove(key);
+            else
+                HttpContext.Session.SetString(key, val);
+        }
         public void OnGetAsync(string? forWhom)
         {
             DanLogger.LogView(HttpContext, ContextName);
-            if (forWhom == null)
-                forWhom = GetFromSession("ForWhom", "A");
-            if (forWhom == "D")
-                JobList = _service.GetJobModels().Where(j => !j.ChildOnly()).OrderBy(j => j.NextDo).ToList();
-            else if (forWhom == "C")
-                JobList = _service.GetJobModels().Where(j => j.ChildOnly()).OrderBy(j => j.NextDo).ToList();
-            else
-                JobList = _service.GetJobModels().OrderBy(j => j.NextDo).ToList();
-            HttpContext.Session.SetString("ForWhom", forWhom);
+            ExcludeList = GetFromSession("ExcludeList", "");
+            var excludeList = ExcludeList.ToCharArray();
+            JobList = _service.GetJobModels().Where(j => !j.IsExcluded(excludeList)).OrderBy(j => j.NextDo).ToList();
+        }
+        public IActionResult OnPostAsync(object o)
+        {
+            DanLogger.LogView(HttpContext, "Change filter to-" + ExcludeList);
+            SetToSession("ExcludeList", ExcludeList);
+
+            return RedirectToPage("./Index");
         }
 
         public IActionResult OnGetProdSync()

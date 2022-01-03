@@ -18,7 +18,7 @@ namespace ChoreMgr.Pages
         protected bool IsAuthed()
         {
             var userName = UserName;
-            var rv = (userName?.StartsWith("192.168.86") == true || userName?.EndsWith("francis@gmail.com") == true || userName == "bookemdano@gmail.com");
+            var rv = (userName?.StartsWith("192.168.86") == true || userName?.EndsWith("francis@gmail.com") == true || userName == "bookemdano@gmail.com" || userName == "::1");
             if (rv == false)
             {
                 var headers = HttpContext.Request.Headers.Select(h => $"{h.Key}={h.Value}");

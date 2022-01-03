@@ -18,7 +18,9 @@ namespace ChoreMgr.Data
         IList<Job> GetJobs()
         {
             if (_jobs == null)
+            {
                 _jobs = ReadJsonDb<Job>();
+            }
             return _jobs;
 
         }

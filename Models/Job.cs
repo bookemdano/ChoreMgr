@@ -17,7 +17,7 @@ namespace ChoreMgr.Models
             Name = job.Name;
             IntervalDays = job.IntervalDays;
             LastDone = job.LastDone;
-            ForWhom = job.ForWhom;
+            Category = job.Category;
         }
 
         [BsonId]
@@ -32,32 +32,32 @@ namespace ChoreMgr.Models
         [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
         public DateTime? LastDone { get; set; }
 
-        [Display(Name = "Who")]
-        public string? ForWhom { get; set; }
+        [Display(Name = "Cat")]
+        public string? Category { get; set; }
 
         internal void Update(Job other)
         {
             Name = other.Name;
             IntervalDays = other.IntervalDays;
             LastDone = other.LastDone;
-            ForWhom = other.ForWhom;
+            Category = other.Category;
         }
 
         public override string ToString()
         {
             var rv = $"{Name}({Id})";
-            if (ForWhom != null)
-                rv += $"[{ForWhom}]";
+            if (Category != null)
+                rv += $"[{Category}]";
             return rv;
         }
 
         internal static string CsvHeader()
         {
-            return $"Id,Name,ForWhom,IntervalDays,LastDone,NextDo";
+            return $"Id,Name,Category,IntervalDays,LastDone,NextDo";
         }
         internal string ToCsv()
         {
-            return $"{Id},{Name},{ForWhom},{IntervalDays},{LastDone?.ToShortDateString()},{JobModel.CalcNextDo(this)?.ToShortDateString()}";
+            return $"{Id},{Name},{Category},{IntervalDays},{LastDone?.ToShortDateString()},{JobModel.CalcNextDo(this)?.ToShortDateString()}";
         }
 
     }
@@ -82,11 +82,20 @@ namespace ChoreMgr.Models
             }
         }
 
+        internal bool IsExcluded(char[] excludeList)
+        {
+            if (string.IsNullOrWhiteSpace(Category))
+                return false;
+            foreach (var exclude in excludeList)
+                if (Category.Contains(exclude))
+                    return true;
+            return false;
+        }
         internal bool ChildOnly()
         {
-            if (ForWhom == null)
+            if (Category == null)
                 return false;
-            return ForWhom.Contains('C', StringComparison.OrdinalIgnoreCase);
+            return Category.Contains('C', StringComparison.OrdinalIgnoreCase);
         }
 
         [Display(Name = "S")]
