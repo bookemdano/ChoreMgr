@@ -26,5 +26,23 @@ namespace ChoreMgr.Pages
             }
             return rv;
         }
+
+        protected string GetFromSession(string key, string def)
+        {
+            if (!HttpContext.Session.Keys.Contains(key))
+                return def;
+
+            var rv = HttpContext.Session.GetString(key);
+            if (string.IsNullOrEmpty(rv))
+                return def;
+            return rv;
+        }
+        protected void SetToSession(string key, string? val)
+        {
+            if (string.IsNullOrWhiteSpace(val))
+                HttpContext.Session.Remove(key);
+            else
+                HttpContext.Session.SetString(key, val);
+        }
     }
 }

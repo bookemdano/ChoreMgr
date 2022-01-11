@@ -19,7 +19,7 @@ namespace ChoreMgr.Models
         DateTime? _doneDate;
         [Display(Name = "Last Done")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
+        [DisplayFormat(DataFormatString = "{0:M/d/yy}")]
         public DateTime? DoneDate
         {
             get

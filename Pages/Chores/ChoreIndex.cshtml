@@ -1,5 +1,5 @@
 ﻿@page
-@model ChoreMgr.Pages.Chores.IndexModel
+@model ChoreMgr.Pages.Chores.ChoreIndexModel
 
 @{
     ViewData["Title"] = "Chores";
@@ -9,25 +9,24 @@
     document.cookie = "yo=yoyo";
 </script>
 <h1>Chores </h1>
-    <div style="float: left">
-        <a asp-page="./Journal">Summary: @Model.Summary</a> <br />
-        Pending: @Model.Pending <br />
-        <a asp-page="Create">Create New</a>
-    </div>
+<div style="float: left">
+    <a asp-page="./Journal">Summary: @Model.Summary</a> <br />
+    Pending: @Model.Pending <br />
+    <a asp-page="ChoreCreate">Create New</a>
+</div>
 
-    <div style="float: right">
-        @if (Model.IsDebug)
-        {
-            <a asp-page-handler="ProdSync">Prod Sync</a>  <br />
-        }
-        <a asp-page-handler="Backup">Backup</a>  <br />
-        <form method="post">
-                <input asp-for="ExcludeList" class="form-control" />
-                <span asp-validation-for="ExcludeList" class="text-danger"></span>
-                <input type="submit" value="Update" class="btn btn-primary" />
-        </form>
-    </div>
-</p>
+<div style="float: right">
+    @if (Model.IsDebug)
+    {
+        <a asp-page-handler="ProdSync">Prod Sync</a>  <br />
+    }
+    <a asp-page-handler="Backup">Backup</a>  <br />
+    <form method="post">
+            <input asp-for="ExcludeList" class="form-control" />
+            <span asp-validation-for="ExcludeList" class="text-danger"></span>
+            <input type="submit" value="Update" class="btn btn-primary" />
+    </form>
+</div>
 <table class="table">
     <thead>
         <tr>

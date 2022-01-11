@@ -1,11 +1,13 @@
 ﻿using ChoreMgr.Models;
 using ChoreMgr.Utils;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace ChoreMgr.Data
 {
     public class ChoreJsonDb
     {
+        private IList<Transaction>? _transactions;
         private IList<Job>? _jobs;
         private IList<JobLog>? _jobLogs;
         private IChoreJsonDbSettings _settings;
@@ -15,15 +17,6 @@ namespace ChoreMgr.Data
             _settings = settings;
         }
 
-        IList<Job> GetJobs()
-        {
-            if (_jobs == null)
-            {
-                _jobs = ReadJsonDb<Job>();
-            }
-            return _jobs;
-
-        }
         internal IList<JobLog> GetJobLogs()
         {
             if (_jobLogs == null)
@@ -34,6 +27,9 @@ namespace ChoreMgr.Data
         #region Low-level
         IList<T> ReadJsonDb<T>()
         {
+            if (!File.Exists(GetFile<T>()))
+                return new List<T>();
+            
             var str = File.ReadAllText(GetFile<T>());
             var rv = JsonConvert.DeserializeObject<IList<T>>(str);
             if (rv == null)
@@ -79,8 +75,46 @@ namespace ChoreMgr.Data
             return $"Source:{_settings.Directory} UseDevTables:{_settings.UseDevTables}";
         }
 
+        #region Transaction table
+
+        IList<Transaction> GetTransactions()
+        {
+            if (_transactions == null)
+            {
+                _transactions = ReadJsonDb<Transaction>();
+            }
+            return _transactions;
+
+        }
+        private void SaveTransactions()
+        {
+            WriteJsonDb<Transaction>(GetTransactions());
+        }
+
+        public List<TransactionModel> GetTransactionModels() => GetTransactions().Select(t => new TransactionModel(t)).ToList();
+
+        public Transaction CreateJob(Transaction transaction, string? userName)
+        {
+            if (transaction.Id == null)
+                transaction.Id = Guid.NewGuid().ToString();
+            GetTransactions().Add(transaction);
+            SaveTransactions();
+            return transaction;
+        }
+
+        #endregion
+
         #region Job table
 
+        IList<Job> GetJobs()
+        {
+            if (_jobs == null)
+            {
+                _jobs = ReadJsonDb<Job>();
+            }
+            return _jobs;
+
+        }
         public List<JobModel> GetJobModels() => GetJobs().Select(j => new JobModel(j)).ToList();
 
         public Job? GetJobFromDb(string? id)

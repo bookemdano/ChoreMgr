@@ -45,13 +45,13 @@ namespace ChoreMgr.Pages.Chores
                 return Page();
             }
             _service.UpdateJob(JobModel, UserName);
-            return RedirectToPage("./Index");
+            return RedirectToPage("./ChoreIndex");
         }
         public IActionResult OnGetDelete(string id)
         {
             DanLogger.LogChange(HttpContext);
             _service.RemoveJob(id, UserName);
-            return RedirectToPage("./Index");
+            return RedirectToPage("./ChoreIndex");
         }
     }
 }

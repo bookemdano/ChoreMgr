@@ -11,7 +11,7 @@
     "ChoreMgr": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5165/Chores",
+      "launchUrl": "http://localhost:5165/Chores/ChoreIndex",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

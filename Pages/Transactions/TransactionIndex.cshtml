@@ -1,0 +1,46 @@
+﻿@page
+@model ChoreMgr.Pages.Transactions.TransactionIndexModel
+
+@{
+    ViewData["Title"] = "Transactions";
+}
+
+<h1>Transactions</h1>
+<a asp-page="TransactionCreate">Create New</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th style="text-align:center;">
+                @Html.DisplayNameFor(model => model.TransactionList[0].Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TransactionList[0].Name)
+            </th>
+            <th style="text-align:center;">
+                @Html.DisplayNameFor(model => model.TransactionList[0].Amount)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.TransactionList) {
+        <tr>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.Category)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td style=@item.AmountStyle>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                <a asp-page-handler="Repeat" asp-route-id="@item.Id">Repeat</a>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+@Model.ContextName
+    

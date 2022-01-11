@@ -9,7 +9,7 @@ namespace ChoreMgr.Models
             DoneDate = done;
             Count = count;
         }
-        [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
+        [DisplayFormat(DataFormatString = "{0:M/d/yy}")]
         public DateTime DoneDate { get; }
         public int Count { get; }
     }

@@ -29,7 +29,7 @@ namespace ChoreMgr.Models
 
         [Display(Name = "Last")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:dd-MMM}")]
+        [DisplayFormat(DataFormatString = "{0:M/d/yy}")]
         public DateTime? LastDone { get; set; }
 
         [Display(Name = "Cat")]
@@ -73,7 +73,7 @@ namespace ChoreMgr.Models
 
         [Display(Name = "Next")]
         [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MMM}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:M/d/yy}")]
         public DateTime? NextDo
         {
             get

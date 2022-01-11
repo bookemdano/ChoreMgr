@@ -11,11 +11,11 @@ namespace ChoreMgr.Pages.Chores
     // TODO Add size to jobs
     // TODONE allow to run in IIS not at root
 
-    public class IndexModel : BasePageModel
+    public class ChoreIndexModel : BasePageModel
     {
         private readonly ChoreJsonDb _service;
 
-        public IndexModel(ChoreJsonDb choreService)
+        public ChoreIndexModel(ChoreJsonDb choreService)
         {
             _service = choreService;
         }
@@ -61,23 +61,6 @@ namespace ChoreMgr.Pages.Chores
                         $"Past due: {JobList.Count(j => j.NextDo?.Date < today)}";
             }
         }
-        string GetFromSession(string key, string def)
-        {
-            if (!HttpContext.Session.Keys.Contains(key))
-                return def;
-
-            var rv = HttpContext.Session.GetString(key);
-            if (string.IsNullOrEmpty(rv))
-                return def;
-            return rv;
-        }
-        void SetToSession(string key, string? val)
-        {
-            if (string.IsNullOrWhiteSpace(val))
-                HttpContext.Session.Remove(key);
-            else
-                HttpContext.Session.SetString(key, val);
-        }
         public void OnGetAsync(string? forWhom)
         {
             DanLogger.LogView(HttpContext, ContextName);
@@ -90,7 +73,7 @@ namespace ChoreMgr.Pages.Chores
             DanLogger.LogView(HttpContext, "Change filter to-" + ExcludeList);
             SetToSession("ExcludeList", ExcludeList);
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./ChoreIndex");
         }
 
         public IActionResult OnGetProdSync()
@@ -100,7 +83,7 @@ namespace ChoreMgr.Pages.Chores
                 return RedirectToPage("/Shared/Unauthorized");
             _service.ProdSync();
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./ChoreIndex");
         }
         public IActionResult OnGetBackup()
         {
@@ -108,7 +91,7 @@ namespace ChoreMgr.Pages.Chores
             if (!IsAuthed())
                 return RedirectToPage("/Shared/Unauthorized");
             _service.Backup();
-            return RedirectToPage("./Index");
+            return RedirectToPage("./ChoreIndex");
         }
         public IActionResult OnGetToday(string id)
         {
@@ -130,7 +113,7 @@ namespace ChoreMgr.Pages.Chores
             jobModel.LastDone = date;
             _service.UpdateJob(jobModel, UserName);
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./ChoreIndex");
         }
     }
 }
