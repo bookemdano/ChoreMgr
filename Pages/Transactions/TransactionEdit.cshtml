@@ -1,0 +1,57 @@
+﻿@page
+@model ChoreMgr.Pages.Chores.TransactionEditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Job ID:@Model.Transaction.Id</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Transaction.Id" />
+            <div class="form-group">
+                <label asp-for="Transaction.Name" class="control-label"></label>
+                <input asp-for="Transaction.Name" class="form-control" />
+                <span asp-validation-for="Transaction.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Transaction.Amount" class="control-label"></label>
+                <input asp-for="Transaction.Amount" class="form-control" />
+                <span asp-validation-for="Transaction.Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Transaction.Timestamp" class="control-label"></label>
+                <input asp-for="Transaction.Timestamp" class="form-control" />
+                <span asp-validation-for="Transaction.Timestamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Transaction.Category" class="control-label"></label>
+                <input asp-for="Transaction.Category" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Transaction.Notes" class="control-label"></label>
+                <input asp-for="Transaction.Notes" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./ChoreIndex">Back to List</a>
+</div>
+
+<div>
+    <a asp-page-handler="Delete" asp-route-id="@Model.Transaction.Id">Delete</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

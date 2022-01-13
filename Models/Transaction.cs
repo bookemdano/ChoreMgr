@@ -10,16 +10,24 @@ namespace ChoreMgr.Models
             Name = String.Empty;
             Timestamp = DateTime.Now;
         }
-        public Transaction(Transaction? Transaction)
+        public Transaction(Transaction? transaction)
         {
-            if (Transaction == null)
-                throw new ArgumentNullException(nameof(Transaction));
-            Id = Transaction.Id;
-            Name = Transaction.Name;
-            Category = Transaction.Category;
-            Notes = Transaction.Notes;
-            Amount = Transaction.Amount;
-            Timestamp = Transaction.Timestamp;
+            if (transaction == null)
+                throw new ArgumentNullException(nameof(transaction));
+            Id = transaction.Id;
+            Name = transaction.Name;
+            Category = transaction.Category;
+            Notes = transaction.Notes;
+            Amount = transaction.Amount;
+            Timestamp = transaction.Timestamp;
+        }
+        internal void Update(Transaction other)
+        {
+            Name = other.Name;
+            Category = other.Category;
+            Notes = other.Notes;
+            Amount = other.Amount;
+            Timestamp = other.Timestamp;
         }
 
         public string? Id { get; set; }
@@ -30,6 +38,15 @@ namespace ChoreMgr.Models
         [DataType(DataType.DateTime)]
         [DisplayFormat(DataFormatString = "{0:M/d/yy HH:mm}")]
         public DateTime Timestamp { get; set; }
+
+        internal static string CsvHeader()
+        {
+            return "Id,Timestamp,Name,Amount,Category,Notes";
+        }
+        internal string ToCsv()
+        {
+            return $"{Id},{Timestamp},{Name},{Amount},{Category},{Notes}";
+        }
     }
     public class TransactionModel : Transaction
     {

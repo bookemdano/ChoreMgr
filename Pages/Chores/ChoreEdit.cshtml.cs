@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ChoreMgr.Pages.Chores
 {
-    public class EditModel : BasePageModel
+    public class ChoreEditModel : BasePageModel
     {
         private readonly ChoreJsonDb _service;
 
-        public EditModel(ChoreJsonDb choreService)
+        public ChoreEditModel(ChoreJsonDb choreService)
         {
             _service = choreService;
         }

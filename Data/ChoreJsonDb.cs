@@ -36,6 +36,7 @@ namespace ChoreMgr.Data
                 rv = new List<T>();
             return rv;
         }
+
         string GetFile<T>()
         {
             return Path.Combine(_settings.Directory, GetFilename<T>() + ".json");
@@ -90,6 +91,11 @@ namespace ChoreMgr.Data
         {
             WriteJsonDb<Transaction>(GetTransactions());
         }
+        internal Transaction? GetTransaction(string id)
+        {
+            return GetTransactions().FirstOrDefault(t => t.Id == id);
+        }
+
 
         public List<TransactionModel> GetTransactionModels() => GetTransactions().Select(t => new TransactionModel(t)).ToList();
 
@@ -100,6 +106,41 @@ namespace ChoreMgr.Data
             GetTransactions().Add(transaction);
             SaveTransactions();
             return transaction;
+        }
+        public void UpdateTransaction(Transaction transaction, string? userName)
+        {
+            if (transaction.Id == null)
+                return;
+            var foundTransaction = GetTransaction(transaction.Id);
+            if (foundTransaction == null)
+                return;
+            foundTransaction.Update(transaction);
+            SaveTransactions();
+        }
+
+        void RemoveTransaction(Transaction transaction, string? userName)
+        {
+            GetTransactions().Remove(transaction);
+            SaveTransactions();
+        }
+
+        public void RemoveTransaction(string id, string? userName)
+        {
+            var transaction = GetTransaction(id);
+            if (transaction != null)
+                RemoveTransaction(transaction, userName);
+        }
+        void BackupTransactions()
+        {
+            DanLogger.Log($"BackupTransactions {this}");
+            File.WriteAllText(FileHelper.CreateDatedFilename(ArchiveDirectory, "notes", "txt"), $"Service:{this}");
+            WriteJsonDb<Transaction>(GetTransactions(), FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Transaction>(), "json"));
+
+            // to csv
+            var outs = new List<string>();
+            outs.Add(Transaction.CsvHeader());
+            outs.AddRange(GetTransactions().Select(t => t.ToCsv()));
+            File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Transaction>(), ".csv"), outs);
         }
 
         #endregion
@@ -178,6 +219,27 @@ namespace ChoreMgr.Data
             if (job != null)
                 RemoveJob(job, userName);
         }
+        void BackupJobs()
+        {
+            DanLogger.Log($"BackupJobs {this}");
+            File.WriteAllText(FileHelper.CreateDatedFilename(ArchiveDirectory, "notes", "txt"), $"Service:{this}");
+            WriteJsonDb<Job>(GetJobs(), FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Job>(), "json"));
+            WriteJsonDb<JobLog>(GetJobLogs(), FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<JobLog>(), "json"));
+
+            // to csv
+            var outs = new List<string>();
+            outs.Add(Job.CsvHeader());
+            outs.AddRange(GetJobs().Select(j => j.ToCsv()));
+            File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Job>(), ".csv"), outs);
+
+            outs = new List<string>();
+            outs.Add($"Id,Updated,JobId,JobName,Note,DoneDate,User");
+            var jobLogs = GetJobLogs();
+            foreach (var jobLog in jobLogs)
+                outs.Add($"{jobLog.Id},{jobLog.Updated},{jobLog.JobId},{jobLog.JobName},{jobLog.Note},{jobLog.DoneDate?.ToShortDateString()},{jobLog.User}");
+            File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<JobLog>(), ".csv"), outs);
+
+        }
 
         #endregion
 
@@ -215,6 +277,8 @@ namespace ChoreMgr.Data
             WriteJsonDb<JobLog>(prodService.GetJobLogs());
             _jobs = ReadJsonDb<Job>();
             _jobLogs = ReadJsonDb<JobLog>();
+            WriteJsonDb<Transaction>(prodService.GetTransactions());
+            _transactions = ReadJsonDb<Transaction>();
         }
 
         ChoreJsonDb CloneFromProd()
@@ -240,23 +304,8 @@ namespace ChoreMgr.Data
         internal void Backup()
         {
             DanLogger.Log($"Backup {this}");
-            File.WriteAllText(FileHelper.CreateDatedFilename(ArchiveDirectory, "notes", "txt"), $"Service:{this}");
-            WriteJsonDb<Job>(GetJobs(), FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Job>(), "json"));
-            WriteJsonDb<JobLog>(GetJobLogs(), FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<JobLog>(), "json"));
-
-            // to csv
-            var outs = new List<string>();
-            outs.Add(Job.CsvHeader());
-            outs.AddRange(GetJobs().Select(j => j.ToCsv()));
-            File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Job>(), ".csv"), outs);
-
-            outs = new List<string>();
-            outs.Add($"Id,Updated,JobId,JobName,Note,DoneDate,User");
-            var jobLogs = GetJobLogs();
-            foreach (var jobLog in jobLogs)
-                outs.Add($"{jobLog.Id},{jobLog.Updated},{jobLog.JobId},{jobLog.JobName},{jobLog.Note},{jobLog.DoneDate?.ToShortDateString()},{jobLog.User}");
-            File.WriteAllLines(FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<JobLog>(), ".csv"), outs);
-
+            BackupJobs();
+            BackupTransactions();
         }
         #endregion 
     }

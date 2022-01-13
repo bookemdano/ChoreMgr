@@ -32,6 +32,14 @@ namespace ChoreMgr.Pages.Transactions
                 return System.Diagnostics.Debugger.IsAttached;
             }
         }
+        public string Total
+        {
+            get
+            {
+                var total = TransactionList.Sum(s => s.Amount);
+                return total.ToString("C");
+            }
+        }
         public IList<TransactionModel> TransactionList { get; set; }
 
         [BindProperty] 
