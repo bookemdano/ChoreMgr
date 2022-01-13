@@ -18,6 +18,7 @@ namespace ChoreMgr.Pages.Chores
         public IActionResult OnGet()
         {
             DanLogger.LogView(HttpContext);
+            Transaction = new Transaction();
             return Page();
         }
 

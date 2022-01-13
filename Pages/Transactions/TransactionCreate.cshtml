@@ -19,13 +19,22 @@
                 <span asp-validation-for="Transaction.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Transaction.Amount" class="control-label"></label>
+                <input asp-for="Transaction.Amount" class="form-control" />
+                <span asp-validation-for="Transaction.Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="Transaction.Category" class="control-label"></label>
                 <input asp-for="Transaction.Category" class="form-control" />
             </div>
             <div class="form-group">
-                <label asp-for="Transaction.Amount" class="control-label"></label>
-                <input asp-for="Transaction.Amount" class="form-control" />
-                <span asp-validation-for="Transaction.Amount" class="text-danger"></span>
+                <label asp-for="Transaction.Notes" class="control-label"></label>
+                <input asp-for="Transaction.Notes" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Transaction.Timestamp" class="control-label"></label>
+                <input asp-for="Transaction.Timestamp" class="form-control" />
+                <span asp-validation-for="Transaction.Timestamp" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

@@ -12,6 +12,7 @@ namespace ChoreMgr.Pages
                 var rv = HttpContext.Request.Cookies["userName"];
                 if (string.IsNullOrEmpty(rv))
                     rv = HttpContext.Request.HttpContext.Connection.RemoteIpAddress?.ToString();
+                SetToSession("CMUserName", rv);
                 return rv;
             }
         }
