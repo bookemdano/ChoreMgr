@@ -34,10 +34,11 @@ namespace ChoreMgr.Models
         public string Name { get; set; }
         public string? Category { get; set; }
         public string? Notes { get; set; }
-        [DisplayFormat(DataFormatString = "{0:C0}", ApplyFormatInEditMode = true)]
+        [Display(Name = "Amount($)")]
+        [DisplayFormat(DataFormatString = "{0:C0}")]
         public decimal Amount { get; set; }
         [DataType(DataType.DateTime)]
-        [DisplayFormat(DataFormatString = "{0:M/d/yy HH:mm}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:g}", ApplyFormatInEditMode = true)]
         public DateTime Timestamp { get; set; }
 
         internal static string CsvHeader()

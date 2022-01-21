@@ -20,13 +20,13 @@
                 <span asp-validation-for="Transaction.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Transaction.Amount" class="control-label"></label>
+                <label asp-for="Transaction.Amount" class="control-label" asp-format="{0:N0}"></label>
                 <input asp-for="Transaction.Amount" class="form-control" />
                 <span asp-validation-for="Transaction.Amount" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Transaction.Timestamp" class="control-label"></label>
-                <input asp-for="Transaction.Timestamp" class="form-control" />
+                <input asp-for="Transaction.Timestamp" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}"/>
                 <span asp-validation-for="Transaction.Timestamp" class="text-danger"></span>
             </div>
             <div class="form-group">

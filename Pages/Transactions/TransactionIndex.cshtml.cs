@@ -37,10 +37,10 @@ namespace ChoreMgr.Pages.Transactions
             get
             {
                 var total = TransactionList.Sum(s => s.Amount);
-                return total.ToString("C");
+                return total.ToString("C0");
             }
         }
-        public IList<TransactionModel> TransactionList { get; set; }
+        public TransactionModel[] TransactionList { get; set; }
 
         [BindProperty] 
         public string ExcludeList { get; set; }
@@ -48,7 +48,7 @@ namespace ChoreMgr.Pages.Transactions
         public void OnGetAsync(string? forWhom)
         {
             DanLogger.LogView(HttpContext, ContextName);
-            TransactionList = _service.GetTransactionModels();
+            TransactionList = _service.GetTransactionModels().OrderByDescending(t => t.Timestamp).ToArray();
         }
     }
 }
