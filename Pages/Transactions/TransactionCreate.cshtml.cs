@@ -36,7 +36,7 @@ namespace ChoreMgr.Pages.Chores
                 return Page();
             }
 
-            _service.CreateJob(Transaction, UserName);
+            _service.CreateTransaction(Transaction, UserName);
         
             return RedirectToPage("./TransactionIndex");
         }

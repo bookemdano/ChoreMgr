@@ -99,7 +99,7 @@ namespace ChoreMgr.Data
 
         public List<TransactionModel> GetTransactionModels() => GetTransactions().Select(t => new TransactionModel(t)).ToList();
 
-        public Transaction CreateJob(Transaction transaction, string? userName)
+        public Transaction CreateTransaction(Transaction transaction, string? userName)
         {
             if (transaction.Id == null)
                 transaction.Id = Guid.NewGuid().ToString();

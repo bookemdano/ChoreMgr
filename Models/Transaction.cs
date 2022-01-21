@@ -45,6 +45,15 @@ namespace ChoreMgr.Models
         {
             return "Id,Timestamp,Name,Amount,Category,Notes";
         }
+
+        internal static Transaction Duplicate(Transaction other)
+        {
+            var rv = new Transaction(other);
+            rv.Id = null;
+            rv.Timestamp = DateTime.Now;
+            return rv;
+        }
+
         internal string ToCsv()
         {
             return $"{Id},{Timestamp},{Name},{Amount},{Category},{Notes}";

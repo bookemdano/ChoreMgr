@@ -50,5 +50,20 @@ namespace ChoreMgr.Pages.Transactions
             DanLogger.LogView(HttpContext, ContextName);
             TransactionList = _service.GetTransactionModels().OrderByDescending(t => t.Timestamp).ToArray();
         }
+        public IActionResult OnGetDup(string id)
+        {
+            var transaction = _service.GetTransaction(id);
+            if (transaction == null)
+                return NotFound();
+            var createdTransaction = _service.CreateTransaction(Transaction.Duplicate(transaction), UserName);
+
+            if (createdTransaction?.Id == null)
+                return NotFound();
+            //http://localhost:5165/Transactions/TransactionEdit?id=645bce6a-0d1b-427e-8142-f1f98dbdaea8
+            var routeValues = new Dictionary<string, object>();
+            routeValues["id"] = createdTransaction.Id;
+            return RedirectToPage("./TransactionEdit", routeValues);
+        }
+        // TODO handle repeat/duplicate
     }
 }

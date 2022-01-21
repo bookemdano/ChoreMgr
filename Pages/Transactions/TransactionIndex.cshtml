@@ -42,7 +42,7 @@
                 @Html.DisplayFor(modelItem => item.Amount)
             </td>
             <td>
-                <a asp-page-handler="Repeat" asp-route-id="@item.Id">Repeat</a>
+                <a asp-page-handler="Dup" asp-route-id="@item.Id">Dup</a>
                 <a asp-page="./TransactionEdit" asp-route-id="@item.Id">Edit</a>
             </td>
         </tr>
