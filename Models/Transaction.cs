@@ -58,6 +58,25 @@ namespace ChoreMgr.Models
         {
             return $"{Id},{Timestamp},{Name},{Amount},{Category},{Notes}";
         }
+
+        internal bool Same(Transaction other)
+        {
+            if (other == null)
+                return false;
+            if (Name != other.Name)
+                return false;
+            if (Amount != other.Amount)
+                return false;
+            if (Category != other.Category)
+                return false;
+            if (Notes != other.Notes)
+                return false;
+            return true;
+        }
+        public override string ToString()
+        {
+            return $"{Name}({Id?.Substring(0,4)}) {Amount} {Category}";
+        }
     }
     public class TransactionModel : Transaction
     {

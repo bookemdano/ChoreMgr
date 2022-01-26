@@ -99,6 +99,25 @@ namespace ChoreMgr.Data
 
         public List<TransactionModel> GetTransactionModels() => GetTransactions().Select(t => new TransactionModel(t)).ToList();
 
+        internal void DedupTransactions()
+        {
+            BackupTransactions();
+            var transactions = GetTransactions();
+            var delList = new List<Transaction>();
+            for (int i = 0; i < transactions.Count() - 1; i++)
+            {
+                for (int j = i + 1; j < transactions.Count(); j++)
+                {
+                    if (transactions[i].Same(transactions[j]))
+                        delList.Add(transactions[j]);
+                }
+            }
+            delList = delList.DistinctBy(t => t.Id).ToList();
+            foreach (var transaction in delList)
+                transactions.Remove(transaction);
+            SaveTransactions();
+        }
+
         public Transaction CreateTransaction(Transaction transaction, string? userName)
         {
             if (transaction.Id == null)

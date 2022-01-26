@@ -37,7 +37,7 @@ namespace ChoreMgr.Pages.Transactions
             get
             {
                 var total = TransactionList.Sum(s => s.Amount);
-                return total.ToString("C0");
+                return total.ToString("C0") + $"({TransactionList.Count()})";
             }
         }
         public TransactionModel[] TransactionList { get; set; }
@@ -64,6 +64,32 @@ namespace ChoreMgr.Pages.Transactions
             routeValues["id"] = createdTransaction.Id;
             return RedirectToPage("./TransactionEdit", routeValues);
         }
-        // TODO handle repeat/duplicate
+        public IActionResult OnGetProdSync()
+        {
+            DanLogger.LogChange(HttpContext);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
+            _service.ProdSync();
+
+            return RedirectToPage("./TransactionIndex");
+        }
+        public IActionResult OnGetBackup()
+        {
+            DanLogger.LogChange(HttpContext);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
+            _service.Backup();
+            return RedirectToPage("./TransactionIndex");
+        }
+        public IActionResult OnGetDedup()
+        {
+            DanLogger.LogChange(HttpContext);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
+            _service.DedupTransactions();
+            return RedirectToPage("./TransactionIndex");
+        }
+
+        // TODONE handle repeat/duplicate
     }
 }

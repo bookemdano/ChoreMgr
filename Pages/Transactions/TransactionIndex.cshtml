@@ -7,7 +7,18 @@
 
 <h1>Transactions</h1>
 <p>Summary: @Model.Total</p>
-<a asp-page="TransactionCreate">Create New</a>
+<div style="float: left">
+    <a asp-page="TransactionCreate">Create New</a>
+</div>
+<div style="float: right">
+    @if (Model.IsDebug)
+    {
+        <a asp-page-handler="ProdSync">Prod Sync</a>  <br />
+    }
+    <a asp-page-handler="Dedup">Dedup</a>  <br />
+    <a asp-page-handler="Backup">Backup</a>  <br />
+</div>
+
 <table class="table">
     <thead>
         <tr>
