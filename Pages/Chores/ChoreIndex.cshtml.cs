@@ -75,6 +75,16 @@ namespace ChoreMgr.Pages.Chores
 
             return RedirectToPage("./ChoreIndex");
         }
+        public IActionResult OnPostQuickCreateAsync(object o)
+        {
+            DanLogger.LogChange(HttpContext, ExcludeList);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
+            var newJob = new Job() { Name = ExcludeList };
+            _service.CreateJob(newJob, UserName);
+
+            return RedirectToPage("./ChoreIndex");
+        }
 
         public IActionResult OnGetProdSync()
         {
