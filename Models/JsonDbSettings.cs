@@ -1,13 +1,13 @@
 ﻿namespace ChoreMgr.Models
 {
-    public class ChoreJsonDbSettings : IChoreJsonDbSettings
+    public class JsonDbSettings : IJsonDbSettings
     {
-        public ChoreJsonDbSettings()
+        public JsonDbSettings()
         {
 
         }
 
-        public ChoreJsonDbSettings(IChoreJsonDbSettings other)
+        public JsonDbSettings(IJsonDbSettings other)
         {
             Directory = other.Directory;
             UseDevTables = other.UseDevTables;
@@ -15,7 +15,7 @@
         public string Directory { get; set; }
         public bool UseDevTables { get; set; }
     }
-    public interface IChoreJsonDbSettings
+    public interface IJsonDbSettings
     {
         string Directory { get; set; }
         bool UseDevTables { get; set; }

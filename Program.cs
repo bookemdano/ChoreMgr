@@ -12,9 +12,9 @@ builder.Services.AddRazorPages();
 //builder.Services.AddSingleton<IChoreMongoSettings>(sp => sp.GetRequiredService<IOptions<ChoreMongoSettings>>().Value);
 //builder.Services.AddSingleton<ChoreMongo>();
 
-builder.Services.Configure<ChoreJsonDbSettings>(builder.Configuration.GetSection(nameof(ChoreJsonDbSettings)));
+builder.Services.Configure<JsonDbSettings>(builder.Configuration.GetSection(nameof(JsonDbSettings)));
 
-builder.Services.AddSingleton<IChoreJsonDbSettings>(sp => sp.GetRequiredService<IOptions<ChoreJsonDbSettings>>().Value);
+builder.Services.AddSingleton<IJsonDbSettings>(sp => sp.GetRequiredService<IOptions<JsonDbSettings>>().Value);
 
 builder.Services.AddSingleton<ChoreJsonDb>();
 builder.Services.AddSession();

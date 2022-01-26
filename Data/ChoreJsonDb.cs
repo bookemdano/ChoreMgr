@@ -5,31 +5,21 @@ using Newtonsoft.Json;
 
 namespace ChoreMgr.Data
 {
-    public class ChoreJsonDb
+    public class JsonDb
     {
-        private IList<Transaction>? _transactions;
-        private IList<Job>? _jobs;
-        private IList<JobLog>? _jobLogs;
-        private IChoreJsonDbSettings _settings;
+        private IJsonDbSettings _settings;
 
-        public ChoreJsonDb(IChoreJsonDbSettings settings)
+        public JsonDb(IJsonDbSettings settings)
         {
             _settings = settings;
         }
 
-        internal IList<JobLog> GetJobLogs()
-        {
-            if (_jobLogs == null)
-                _jobLogs = ReadJsonDb<JobLog>();
-            return _jobLogs;
-
-        }
         #region Low-level
-        IList<T> ReadJsonDb<T>()
+        protected IList<T> ReadJsonDb<T>()
         {
             if (!File.Exists(GetFile<T>()))
                 return new List<T>();
-            
+
             var str = File.ReadAllText(GetFile<T>());
             var rv = JsonConvert.DeserializeObject<IList<T>>(str);
             if (rv == null)
@@ -41,29 +31,30 @@ namespace ChoreMgr.Data
         {
             return Path.Combine(_settings.Directory, GetFilename<T>() + ".json");
         }
-        string GetFilename<T>()
+        protected string GetFilename<T>()
         {
             var prefix = string.Empty;
             if (_settings.UseDevTables)
                 prefix = "DEV_";
             return $"{prefix}{typeof(T).Name}";
         }
-        string ArchiveDirectory
+        protected string ArchiveDirectory
         {
             get
             {
                 return Path.Combine(_settings.Directory, "archive");
             }
         }
-        bool WriteJsonDb<T>(IList<T> objs)
+        protected bool WriteJsonDb<T>(IList<T> objs)
         {
             // write backup
             WriteJsonDb<T>(objs, FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<T>(), "json"));
 
             return WriteJsonDb<T>(objs, GetFile<T>());
         }
-        bool WriteJsonDb<T>(IList<T> objs, string filename)
+        protected bool WriteJsonDb<T>(IList<T> objs, string filename)
         {
+            DanLogger.Log($"DATA WriteJsonDb {typeof(T)} {filename} {objs?.Count} items");
             var str = JsonConvert.SerializeObject(objs, Formatting.Indented);
             File.WriteAllText(filename, str);
             return true;
@@ -76,6 +67,31 @@ namespace ChoreMgr.Data
             return $"Source:{_settings.Directory} UseDevTables:{_settings.UseDevTables}";
         }
 
+        protected IJsonDbSettings CloneSettingsFromProd()
+        {
+            var prodSettings = new JsonDbSettings(_settings);
+            prodSettings.UseDevTables = false;
+            return prodSettings;
+        }
+    }
+
+    public class ChoreJsonDb : JsonDb
+    {
+        private IList<Transaction>? _transactions;
+        private IList<Job>? _jobs;
+        private IList<JobLog>? _jobLogs;
+
+        public ChoreJsonDb(IJsonDbSettings settings) : base(settings)
+        {
+        }
+
+        internal IList<JobLog> GetJobLogs()
+        {
+            if (_jobLogs == null)
+                _jobLogs = ReadJsonDb<JobLog>();
+            return _jobLogs;
+
+        }
         #region Transaction table
 
         IList<Transaction> GetTransactions()
@@ -302,9 +318,7 @@ namespace ChoreMgr.Data
 
         ChoreJsonDb CloneFromProd()
         {
-            var prodSettings = new ChoreJsonDbSettings(_settings);
-            prodSettings.UseDevTables = false;
-            return new ChoreJsonDb(prodSettings);
+            return new ChoreJsonDb(CloneSettingsFromProd());
         }
 
         #region Logging

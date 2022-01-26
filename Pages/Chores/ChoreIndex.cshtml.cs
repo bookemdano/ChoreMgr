@@ -77,6 +77,9 @@ namespace ChoreMgr.Pages.Chores
         }
         public IActionResult OnPostQuickCreateAsync(object o)
         {
+            if (string.IsNullOrWhiteSpace(ExcludeList))
+                return RedirectToPage("./ChoreCreate");
+
             DanLogger.LogChange(HttpContext, ExcludeList);
             if (!IsAuthed())
                 return RedirectToPage("/Shared/Unauthorized");
