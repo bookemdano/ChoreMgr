@@ -1,79 +1,9 @@
 ﻿using ChoreMgr.Models;
 using ChoreMgr.Utils;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace ChoreMgr.Data
 {
-    public class JsonDb
-    {
-        private IJsonDbSettings _settings;
-
-        public JsonDb(IJsonDbSettings settings)
-        {
-            _settings = settings;
-        }
-
-        #region Low-level
-        protected IList<T> ReadJsonDb<T>()
-        {
-            if (!File.Exists(GetFile<T>()))
-                return new List<T>();
-
-            var str = File.ReadAllText(GetFile<T>());
-            var rv = JsonConvert.DeserializeObject<IList<T>>(str);
-            if (rv == null)
-                rv = new List<T>();
-            return rv;
-        }
-
-        string GetFile<T>()
-        {
-            return Path.Combine(_settings.Directory, GetFilename<T>() + ".json");
-        }
-        protected string GetFilename<T>()
-        {
-            var prefix = string.Empty;
-            if (_settings.UseDevTables)
-                prefix = "DEV_";
-            return $"{prefix}{typeof(T).Name}";
-        }
-        protected string ArchiveDirectory
-        {
-            get
-            {
-                return Path.Combine(_settings.Directory, "archive");
-            }
-        }
-        protected bool WriteJsonDb<T>(IList<T> objs)
-        {
-            // write backup
-            WriteJsonDb<T>(objs, FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<T>(), "json"));
-
-            return WriteJsonDb<T>(objs, GetFile<T>());
-        }
-        protected bool WriteJsonDb<T>(IList<T> objs, string filename)
-        {
-            DanLogger.Log($"DATA WriteJsonDb {typeof(T)} {filename} {objs?.Count} items");
-            var str = JsonConvert.SerializeObject(objs, Formatting.Indented);
-            File.WriteAllText(filename, str);
-            return true;
-        }
-
-        #endregion  //Low-level
-
-        public override string ToString()
-        {
-            return $"Source:{_settings.Directory} UseDevTables:{_settings.UseDevTables}";
-        }
-
-        protected IJsonDbSettings CloneSettingsFromProd()
-        {
-            var prodSettings = new JsonDbSettings(_settings);
-            prodSettings.UseDevTables = false;
-            return prodSettings;
-        }
-    }
 
     public class ChoreJsonDb : JsonDb
     {
@@ -117,6 +47,7 @@ namespace ChoreMgr.Data
 
         internal void DedupTransactions()
         {
+            DanLogger.Log("DedupTransactions()");
             BackupTransactions();
             var transactions = GetTransactions();
             var delList = new List<Transaction>();
@@ -136,6 +67,7 @@ namespace ChoreMgr.Data
 
         public Transaction CreateTransaction(Transaction transaction, string? userName)
         {
+            DanLogger.Log("CreateTransaction()");
             if (transaction.Id == null)
                 transaction.Id = Guid.NewGuid().ToString();
             GetTransactions().Add(transaction);
@@ -144,6 +76,7 @@ namespace ChoreMgr.Data
         }
         public void UpdateTransaction(Transaction transaction, string? userName)
         {
+            DanLogger.Log("UpdateTransaction()");
             if (transaction.Id == null)
                 return;
             var foundTransaction = GetTransaction(transaction.Id);
@@ -155,6 +88,7 @@ namespace ChoreMgr.Data
 
         void RemoveTransaction(Transaction transaction, string? userName)
         {
+            DanLogger.Log("RemoveTransaction()");
             GetTransactions().Remove(transaction);
             SaveTransactions();
         }
@@ -169,7 +103,7 @@ namespace ChoreMgr.Data
         {
             DanLogger.Log($"BackupTransactions {this}");
             File.WriteAllText(FileHelper.CreateDatedFilename(ArchiveDirectory, "notes", "txt"), $"Service:{this}");
-            WriteJsonDb<Transaction>(GetTransactions(), FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Transaction>(), "json"));
+            Backup<Transaction>(GetTransactions());
 
             // to csv
             var outs = new List<string>();
@@ -258,8 +192,8 @@ namespace ChoreMgr.Data
         {
             DanLogger.Log($"BackupJobs {this}");
             File.WriteAllText(FileHelper.CreateDatedFilename(ArchiveDirectory, "notes", "txt"), $"Service:{this}");
-            WriteJsonDb<Job>(GetJobs(), FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<Job>(), "json"));
-            WriteJsonDb<JobLog>(GetJobLogs(), FileHelper.CreateDatedFilename(ArchiveDirectory, GetFilename<JobLog>(), "json"));
+            Backup<Job>(GetJobs());
+            Backup<JobLog>(GetJobLogs());
 
             // to csv
             var outs = new List<string>();
