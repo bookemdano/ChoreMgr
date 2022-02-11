@@ -18,6 +18,9 @@ namespace ChoreMgr.Pages.Chores
         public IActionResult OnGet()
         {
             DanLogger.LogView(HttpContext);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
+
             return Page();
         }
 

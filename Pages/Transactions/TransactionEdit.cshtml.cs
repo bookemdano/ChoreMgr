@@ -39,6 +39,8 @@ namespace ChoreMgr.Pages.Chores
         public async Task<IActionResult> OnPostAsync()
         {
             DanLogger.LogChange(HttpContext, Transaction);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
 
             if (!ModelState.IsValid)
             {
@@ -50,6 +52,8 @@ namespace ChoreMgr.Pages.Chores
         public IActionResult OnGetDelete(string id)
         {
             DanLogger.LogChange(HttpContext);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
             _service.RemoveTransaction(id, UserName);
             return RedirectToPage("./TransactionIndex");
         }

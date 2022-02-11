@@ -61,12 +61,16 @@ namespace ChoreMgr.Pages.Chores
                         $"Past due: {JobList.Count(j => j.NextDo?.Date < today)}";
             }
         }
-        public void OnGetAsync(string? forWhom)
+        public IActionResult OnGetAsync(string? forWhom)
         {
             DanLogger.LogView(HttpContext, ContextName);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
+
             ExcludeList = GetFromSession("ExcludeList", "");
             var excludeList = ExcludeList.ToCharArray();
             JobList = _service.GetJobModels().Where(j => !j.IsExcluded(excludeList)).OrderBy(j => j.NextDo).ToList();
+            return Page();
         }
         public IActionResult OnPostAsync(object o)
         {

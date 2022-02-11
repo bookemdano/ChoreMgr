@@ -45,13 +45,19 @@ namespace ChoreMgr.Pages.Transactions
         [BindProperty] 
         public string ExcludeList { get; set; }
 
-        public void OnGetAsync(string? forWhom)
+        public IActionResult OnGetAsync(string? forWhom)
         {
             DanLogger.LogView(HttpContext, ContextName);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
             TransactionList = _service.GetTransactionModels().OrderByDescending(t => t.Timestamp).ToArray();
+            return Page();
         }
         public IActionResult OnGetDup(string id)
         {
+            DanLogger.LogChange(HttpContext);
+            if (!IsAuthed())
+                return RedirectToPage("/Shared/Unauthorized");
             var transaction = _service.GetTransaction(id);
             if (transaction == null)
                 return NotFound();
