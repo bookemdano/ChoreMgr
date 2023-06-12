@@ -10,7 +10,7 @@
 <h4>Job ID:@Model.JobModel.Id</h4>
 <hr />
 <script type="text/javascript">
-    function setInterval(days) {
+    function setIntervalDays(days) {
         if (!isNaN(days))
             document.getElementById("JobModel_IntervalDays").value = days;
     }
@@ -34,12 +34,12 @@
                 <input asp-for="JobModel.IntervalDays" class="form-control" />
                 <span asp-validation-for="JobModel.IntervalDays" class="text-danger"></span>
             </div>
-            <a href="javascript:setInterval(1);">Daily</a>
-            <a href="javascript:setInterval(7);">Weekly</a>
-            <a href="javascript:setInterval(14);">Fortnightly</a>
-            <a href="javascript:setInterval(30);">Monthly</a>
-            <a href="javascript:setInterval(90);">Quarterly</a>
-            <a href="javascript:setInterval(365);">Yearly</a>
+            <a href="javascript:setIntervalDays(1);">Daily</a>
+            <a href="javascript:setIntervalDays(7);">Weekly</a>
+            <a href="javascript:setIntervalDays(14);">Fortnightly</a>
+            <a href="javascript:setIntervalDays(30);">Monthly</a>
+            <a href="javascript:setIntervalDays(90);">Quarterly</a>
+            <a href="javascript:setIntervalDays(365);">Yearly</a>
             <div class="form-group">
                 <label class="control-label">Last Done</label>
                 <input asp-for="JobModel.LastDone" class="form-control" />
