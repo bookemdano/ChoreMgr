@@ -18,17 +18,24 @@ builder.Services.AddSingleton<IJsonDbSettings>(sp => sp.GetRequiredService<IOpti
 
 builder.Services.AddSingleton<ChoreJsonDb>();
 builder.Services.AddSession();
-builder.Services.AddAuthentication().AddGoogle(googleOptions =>
+var yesGoogle = false;
+if (yesGoogle)
 {
-    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-}); 
+    builder.Services.AddAuthentication().AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    });
+}
 
 var app = builder.Build();
 
+if (yesGoogle)
+{
+    app.MapGet("GoogleSignin", () => ChoreMgr.Pages.IndexModel.GoogleSignin());
+    app.MapGet("signin-google", () => ChoreMgr.Pages.IndexModel.GoogleSignin());
+}
 
-app.MapGet("GoogleSignin", () => ChoreMgr.Pages.IndexModel.GoogleSignin());
-app.MapGet("signin-google", () => ChoreMgr.Pages.IndexModel.GoogleSignin());
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
