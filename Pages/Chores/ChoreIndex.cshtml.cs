@@ -36,7 +36,8 @@ namespace ChoreMgr.Pages.Chores
         }
         public IList<JobModel> JobList { get; set; }
 
-        [BindProperty] 
+        [BindProperty]
+        // a list of categories to exclude, each category is one character, or a limit of new tasks to avoid being overwhelmed
         public string ExcludeList { get; set; }
 
         public string Summary
@@ -68,10 +69,34 @@ namespace ChoreMgr.Pages.Chores
                 return RedirectToPage("/Shared/Unauthorized");
 
             ExcludeList = GetFromSession("ExcludeList", "");
-            var excludeList = ExcludeList.ToCharArray();
-            JobList = _service.GetJobModels().Where(j => !j.IsExcluded(excludeList)).OrderBy(j => j.NextDo).ToList();
+            if (int.TryParse(ExcludeList, out int enough))
+            {
+                var jobs = _service.GetJobModels();
+                var list = jobs.Where(j => j.Status == "❕" || j.Status == "✅").ToList();
+                var notDone = jobs.Where(j => j.Status == "❌").ToList();
+                list.AddRange(GetSome(notDone, enough));
+                JobList = list.OrderBy(j => j.NextDo).ToList();
+            }
+            else
+            {
+                var excludeList = ExcludeList.ToCharArray();
+                JobList = _service.GetJobModels().Where(j => !j.IsExcluded(excludeList)).OrderBy(j => j.NextDo).ToList();
+            }
             return Page();
         }
+        Random _rnd = new Random();
+        private IEnumerable<JobModel> GetSome(List<JobModel> jobs, int n)
+        {
+            var rv = new List<JobModel>();
+            while (rv.Count() < n)
+            {
+                var job = jobs[_rnd.Next(jobs.Count)];
+                if (!rv.Contains(job))
+                    rv.Add(job);
+            }
+            return rv;
+        }
+
         public IActionResult OnPostAsync(object o)
         {
             DanLogger.LogView(HttpContext, "Change filter to-" + ExcludeList);
