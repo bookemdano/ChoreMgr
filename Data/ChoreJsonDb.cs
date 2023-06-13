@@ -1,6 +1,5 @@
 ﻿using ChoreMgr.Models;
 using ChoreMgr.Utils;
-using Microsoft.EntityFrameworkCore;
 
 namespace ChoreMgr.Data
 {
