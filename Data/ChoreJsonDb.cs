@@ -9,6 +9,7 @@ namespace ChoreMgr.Data
         private IList<Transaction>? _transactions;
         private IList<Job>? _jobs;
         private IList<JobLog>? _jobLogs;
+        private IList<Quote>? _quotes;
 
         public ChoreJsonDb(IJsonDbSettings settings) : base(settings)
         {
@@ -21,6 +22,36 @@ namespace ChoreMgr.Data
             return _jobLogs;
 
         }
+
+        #region Quote table
+
+        IList<Quote> GetQuotes()
+        {
+            if (_quotes == null)
+                _quotes = ReadJsonDb<Quote>();
+            return _quotes;
+
+        }
+        private void SaveQuotes()
+        {
+            WriteJsonDb<Quote>(GetQuotes());
+        }
+        public void PullQuotes()
+        {
+            _quotes = new OfficeInterop().ReadWord();
+            SaveQuotes();
+        }
+        Random _rnd = new Random();
+
+        internal Quote? GetRandQuote()
+        {
+            var quotes = GetQuotes();
+            if (quotes?.Any() != true)
+                return null;
+            return quotes[_rnd.Next(quotes.Count())];
+        }
+        #endregion
+
         #region Transaction table
 
         IList<Transaction> GetTransactions()

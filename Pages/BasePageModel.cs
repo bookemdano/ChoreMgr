@@ -33,7 +33,7 @@ namespace ChoreMgr.Pages
             {
                 rv = (tempUserHash == OpSec.GetHash(TempCode()));
             }
-            var localPinBypass = false;  // whether to greenlight everything from local network
+            var localPinBypass = true;  // whether to greenlight everything from local network
             if (rv == false && localPinBypass)
             {
                 var userName = UserName;

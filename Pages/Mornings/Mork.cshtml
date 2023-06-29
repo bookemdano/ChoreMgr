@@ -1,0 +1,14 @@
+﻿@page
+@model ChoreMgr.Pages.Mornings.MorkModel
+@{
+}
+
+@{
+    ViewData["Title"] = "Morning";
+}
+
+<h1>Morning</h1>
+<div style="float: left">
+    <a asp-page-handler="Repull">Re-Pull</a>  <br />
+    @Model.Daily <br />
+</div>
