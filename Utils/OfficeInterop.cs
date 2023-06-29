@@ -8,10 +8,12 @@ namespace ChoreMgr.Utils
         Word.Application _appWord = null;
         internal List<Quote> ReadWord()
         {
-            var filename = $"weekly{DateTime.Today.ToString("yyyyMM")}.txt";
+            DanLogger.Log("Read from Word");
+            //var filename = $"weekly{DateTime.Today.ToString("yyyyMM")}.txt";
             if (_appWord == null)
                 _appWord = new Word.Application();
 
+            DanLogger.Log("Open file");
             var word = _appWord.Documents.Open(@"F:\OneDrive\Dan\weekly51.docx", true, true);
             var rv = new List<Quote>();
             var quote = new Quote(Guid.NewGuid().ToString());

@@ -28,7 +28,7 @@ namespace ChoreMgr.Pages.Mornings
 
             if (_service.GetRandQuote() == null)
                 _service.PullQuotes();
-            Daily = _service.GetRandQuote().ToString();
+            Daily = _service.GetRandQuote()?.ToString();
             return Page();
         }
         public IActionResult OnGetRepull()
@@ -37,7 +37,7 @@ namespace ChoreMgr.Pages.Mornings
             if (!IsAuthed())
                 return RedirectToPage("/Shared/Unauthorized");
             _service.PullQuotes();
-            Daily = _service.GetRandQuote().ToString();
+            Daily = _service.GetRandQuote()?.ToString();
             return RedirectToPage("./Mork");
         }
 

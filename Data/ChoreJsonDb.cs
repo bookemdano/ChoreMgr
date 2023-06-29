@@ -38,8 +38,15 @@ namespace ChoreMgr.Data
         }
         public void PullQuotes()
         {
-            _quotes = new OfficeInterop().ReadWord();
-            SaveQuotes();
+            try
+            {
+                _quotes = new OfficeInterop().ReadWord();
+                SaveQuotes();
+            }
+            catch (Exception ex)
+            {
+                DanLogger.Error("PullQuotes()", ex);
+            }
         }
         Random _rnd = new Random();
 
